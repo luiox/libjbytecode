@@ -6,6 +6,7 @@ target("libjbytecode_core")
     add_packages("libca", "libjstr", "libgarena", {public = true})
     add_includedirs("src", {public = true})
     add_files("src/jbytecode/core/*.cpp")
+    add_headerfiles("src/(jbytecode/core/**.hpp)")
     if is_plat("windows") then
         add_cxflags("/utf-8", {tools = "cl"})
     end

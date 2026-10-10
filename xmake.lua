@@ -57,6 +57,7 @@ target("libjbytecode")
     add_includedirs("src", {public = true})
     -- 聚合库自带一个查版本号的接口，使子库形态落成真 lib 而非纯聚合。
     add_files("src/jbytecode/*.cpp")
+    add_headerfiles("src/(jbytecode/*.hpp)")
     if is_plat("windows") then
         add_cxflags("/utf-8", {tools = "cl"})
     end
