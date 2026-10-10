@@ -2,7 +2,7 @@
 --
 -- 依赖：
 --   - libca（luiox-repo git 直连包）：core/str/log/crypto 为运行依赖，test 为
---     测试门面依赖；版本锁固定 0.0.13，升级须显式换版。
+--     测试门面依赖；版本锁固定 0.0.14，升级须显式换版。
 --   - libjstr / libgarena（luiox-repo git 直连包）：core 子库的编码与 arena 底座。
 --   - libjzip（luiox-repo git 直连包）：仅 --with_demo=y（Jar 系 demo）。
 --   - gtest（xrepo，仅 --with_tests=y）。
@@ -15,9 +15,9 @@
 set_languages("cxx17")
 add_rules("mode.debug", "mode.release")
 
-add_requires("libca 0.0.13", {configs = {modules = "core,str,log,crypto,test"}})
-add_requires("libjstr 0.0.1")
-add_requires("libgarena 0.0.1")
+add_requires("libca 0.0.14", {configs = {modules = "core,str,log,crypto,test"}})
+add_requires("libjstr 0.0.2")
+add_requires("libgarena 0.0.2")
 
 option("with_tests")
     set_default(false)
@@ -36,7 +36,7 @@ if has_config("with_tests") then
 end
 
 if has_config("with_demo") then
-    add_requires("libjzip 0.0.1")
+    add_requires("libjzip 0.0.2")
 end
 
 -- libjbytecode 聚合库：各子模块拆为独立子库，此 target 聚合全部子库及统一入口头文件。
