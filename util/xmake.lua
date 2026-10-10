@@ -7,7 +7,7 @@ target("libjbytecode_util")
     add_deps("libjbytecode_core", "libjbytecode_tree", "libjbytecode_analysis")
     add_includedirs("src", {public = true})
     add_files("src/jbytecode/util/*.cpp")
-    add_headerfiles("src/(jbytecode/util/**.hpp)")
+    add_headerfiles("src/(jbytecode/util/**.hpp)", "src/(jbytecode/util/**.inl)")
     if is_plat("windows") then
         add_cxflags("/utf-8", {tools = "cl"})
     end

@@ -7,7 +7,7 @@ target("libjbytecode_tree")
     add_deps("libjbytecode_core")
     add_includedirs("src", {public = true})
     add_files("src/jbytecode/tree/*.cpp")
-    add_headerfiles("src/(jbytecode/tree/**.hpp)")
+    add_headerfiles("src/(jbytecode/tree/**.hpp)", "src/(jbytecode/tree/**.inl)")
     if is_plat("windows") then
         add_cxflags("/utf-8", {tools = "cl"})
     end
