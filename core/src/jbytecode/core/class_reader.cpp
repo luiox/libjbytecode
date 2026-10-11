@@ -1138,8 +1138,7 @@ void ClassReader::readCode(MethodVisitor* mv, Context& ctx, int codeOff)
     bool             compressedFrames             = true;
     std::vector<int> visibleTypeAnnotationOffsetsVec;
     std::vector<int> invisibleTypeAnnotationOffsetsVec;
-    Attribute*       codeAttributes = nullptr;
-    int              caCnt          = readUnsignedShort(off);
+    int              caCnt = readUnsignedShort(off);
     off += 2;
     for (int a = 0; a < caCnt; a++) {
         auto an = readUTF8(off, buf);

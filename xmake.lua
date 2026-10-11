@@ -70,6 +70,8 @@ includes("util")
 
 if has_config("with_demo") then
     includes("demo")
+    -- core/demo：core 子库示例（此前无 include 链注册，target 永不生效）
+    includes("core/demo")
 end
 
 -- asm-test：ASM 对齐/集成扩展测试（含 test_resource 预编译样本）。

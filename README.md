@@ -2,7 +2,7 @@
 
 OW2 ASM 的 C++ 移植，提供 Java `.class` 字节码的解析、生成、分析与变换能力。
 
-- **语言**：C++17，全局禁用 RTTI（向下转型用 `typed::cast<T>`）
+- **语言**：C++17，规避 RTTI（向下转型用 libca 的 `ca::core::tag_cast::cast<T>`，不用 `dynamic_cast`）
 - **构建系统**：Xmake（≥ 3.0）
 - **命名空间**：`jbytecode`（子模块 `jbytecode::core` / `::tree` / `::commons` / `::analysis` / `::util`）
 - **统一入口**：`#include <jbytecode/jbytecode.hpp>`（聚合头文件，可按需单独包含子模块）
@@ -44,11 +44,10 @@ xmake run libjbytecode_asm_core_unittest
 | `libjbytecode` | 静态库 | 聚合库（统一头 + 串联子库） |
 | `libjbytecode_asm_core_unittest` / `_tree_unittest` / `_commons_unittest` / `_analysis_unittest` / `_util_unittest` | 测试 | 子模块单元测试（默认关闭，`--with_tests=y`） |
 | `libjbytecode_origin_unittest` | 测试 | core 单元测试（同 asm_core 源，独立 target） |
-| `demo_*` | 可执行 | 各类用法示例（默认关闭，`--with_demos=y`） |
+| `demo_*` | 可执行 | 各类用法示例（默认关闭，`--with_demo=y`） |
 
 ```bash
-# 最小构建（只需 libca submodule；zlib 走 xrepo 自动拉取）
-git submodule update --init third_party/libca
+# 最小构建（libca / libjstr / libgarena 由 luiox-repo 包自动拉取）
 xmake build libjbytecode_core
 
 # 完整库 + 测试
@@ -58,8 +57,7 @@ xmake build libjbytecode && xmake run libjbytecode_asm_core_unittest
 
 ## 测试纪律
 
-- 测试资源生成与 ASM 参考回放见
-  [`script/roundtrip_verifier/README.md`](../../script/roundtrip_verifier/README.md)。生成过程只写
+- 测试资源由仓库外的生成脚本（ASM 参考回放）产生，生成过程只写
   `test/`，不得直接写入 `test_resource/`。
 - 对齐型测试的期望值必须来自参考实现、预编译样本，或可自证的生成型 probe。
 - 默认 round-trip 契约是结构与指令语义一致；常量池顺序、属性布局和等价帧编码不要求
@@ -72,11 +70,11 @@ xmake build libjbytecode && xmake run libjbytecode_asm_core_unittest
 
 | 库 | 用于 | 用途 |
 |----|------|------|
-| libca_core | core | `ca::i32` / `ca::u8` 等基础类型 |
-| libca_str | core | `Utf8StringRef` / `Utf8String` 语义字符串类型 |
-| libca_crypto | core | SHA-1（`SerialVersionUIDAdder`） |
-| libjstr | core | 字符串工具 |
-| libtyped | tree/commons/analysis/util | `typed::cast<T>` 向下转型（RTTI 已全局关闭） |
+| libca | 全部子库 | `ca::i32` / `ca::u8` 基础类型、`Utf8StringRef` 语义字符串、`ca::core::tag_cast` 向下转型、SHA-1（`SerialVersionUIDAdder`）、log 宏、`ca::test` 测试布局 |
+| libjstr | core | MUTF-8 / WTF-8 字符串转换 |
+| libgarena | core | arena 内存底座 |
+| libjzip | demo | Jar 读写（仅 `--with_demo=y`） |
+| gtest | 测试 | 单元测试（仅 `--with_tests=y`，走 xrepo） |
 
 ## 快速开始
 
@@ -85,10 +83,13 @@ xmake build libjbytecode && xmake run libjbytecode_asm_core_unittest
 using namespace jbytecode;
 using namespace jbytecode::core;
 
+// arena 借宿常量池解码出的 UTF-8 字符串，生命周期需覆盖 reader/writer
+ca::str::Utf8StringArena arena;
+
 // 直通回放：读取 → 写出
 std::vector<ca::u8> bytes = /* 读 .class */;
-ClassReader reader(bytes.data(), (ca::i32)bytes.size());
-ClassWriter writer;
+ClassReader reader(arena, bytes.data(), (ca::i32)bytes.size());
+ClassWriter writer(arena);
 reader.accept(&writer, /*parsingOptions=*/0);
 std::vector<ca::u8> out = writer.toByteArray();
 
@@ -111,8 +112,3 @@ cn.accept(&writer);
 | [doc/analysis.md](doc/analysis.md) | Analysis 设计：Analyzer + Interpreter 数据流框架 |
 | [doc/util.md](doc/util.md) | Util 设计：Printer/Textifier/ASMifier、Trace、CheckAdapter |
 | [doc/safety.md](doc/safety.md) | 安全使用指南：迭代器失效、accept 链契约、线程/异常安全 |
-| [dev_plan.md](dev_plan.md) | 未完成事项与已知差距 |
-
-## License
-
-MIT
