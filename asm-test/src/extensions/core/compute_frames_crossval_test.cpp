@@ -236,6 +236,9 @@ TEST(ComputeFramesCrossVal, simpleReturnFramesReadable)
     ClassFrameCheckVisitor cv;
     ClassReader            reader(asmArena, bytes.data(), 0, static_cast<ca::i32>(bytes.size()));
     reader.accept(&cv, 0);
+    // accept 正常返回即证明可读；fcv 非空再排除「visitMethod 未被回调」的空跑路径
+    // （与同族 branchIf/tableSwitch/tryCatch 用例同口径）。
+    ASSERT_TRUE(cv.fcv != nullptr);
     // no frames needed for simpleReturn
     SUCCEED();
 }
