@@ -488,7 +488,12 @@ inline SignatureCollector collectAvailableSignatures()
     SignatureCollector all;
     for (const auto& clazz : availablePrecompiledClasses()) {
         auto bytes = clazz.bytes();
-        if (bytes.empty()) continue;
+        // 资源缺失不允许静默缩容签名语料（否则下游用例可能零迭代空过）：
+        // 显式记失败，保底由调用方的 ASSERT_FALSE(...empty()) 兜底全空场景。
+        if (bytes.empty()) {
+            ADD_FAILURE() << "collectAvailableSignatures: missing resource " << clazz.resource;
+            continue;
+        }
         SignatureCollector current;
         jbytecode::core::ClassReader(asmArena, bytes).accept(&current, 0);
         all.classSignatures.insert(all.classSignatures.end(),

@@ -109,15 +109,3 @@ TEST(ClassFileSanitizerTest, joinProducesSingleLineWithSeparator)
     EXPECT_EQ(text.find('\n'), std::string::npos) << text;
     EXPECT_NE(text.find("2 issue(s): issue one; issue two"), std::string::npos) << text;
 }
-
-// TEMP-DEBUG: dump m4 bytes
-#include <cstdio>
-TEST(TempDebug, DumpCondyCycleBytes)
-{
-    auto bytes = []() {
-        // 直接内联生成器逻辑的拷贝会漂移；这里重建 builder 不可行（mtest_set 依赖）。
-        // 退而求其次：打印 sanitize 各阶段（借 manifest 断言先跑过的结论）。
-        return std::vector<ca::u8>{};
-    }();
-    (void) bytes;
-}

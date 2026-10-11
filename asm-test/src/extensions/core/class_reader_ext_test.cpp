@@ -743,20 +743,38 @@ TEST(ClassReaderInternalTest, testRecordComponent)
 
 TEST(ClassReaderInternalTest, testNestMembers)
 {
-    auto bytes = requireGen("AllFeatures.class");
+    // 旧版只统计 visitNestMember 回调却零断言（空跑）；且 fixture 映射到 jdk8
+    // 样本（V8 无 NestMembers 属性），无从触发该路径。改为构造 V11 nest 类回读，
+    // 真实验证 NestMembers 写出→解析闭环。
+    ClassWriter cw(asmArena);
+    cw.visit(Opcodes::V11,
+             Opcodes::ACC_PUBLIC,
+             ZUtf8StringRef::from_static("pkg/Host"),
+             ZUtf8StringRef::from_static(""),
+             ZUtf8StringRef::from_static("java/lang/Object"),
+             {});
+    cw.visitNestHost(ZUtf8StringRef::from_static("pkg/Host"));
+    cw.visitNestMember(ZUtf8StringRef::from_static("pkg/Host$A"));
+    cw.visitNestMember(ZUtf8StringRef::from_static("pkg/Host$B"));
+    cw.visitEnd();
+    auto bytes = cw.toByteArray();
+    ASSERT_GT(bytes.size(), 4u);
 
     ClassReader cr(asmArena, bytes);
     struct V : ClassVisitor
     {
-        int nestMembers = 0;
+        std::vector<std::string> members;
         V()
             : ClassVisitor(Opcodes::ASM9)
         {}
-        void visitNestMember(ca::str::Utf8StringRef) override { nestMembers++; }
+        void visitNestMember(ca::str::Utf8StringRef nestMember) override
+        {
+            members.push_back(S(nestMember));
+        }
     };
     V v;
     cr.accept(&v, 0);
-    // AllFeatures has inner class AllFeatures$Inner, may have nest members
+    EXPECT_EQ((std::vector<std::string>{"pkg/Host$A", "pkg/Host$B"}), v.members);
 }
 
 // ---- InnerClasses ----
@@ -803,6 +821,8 @@ TEST(ClassReaderInternalTest, testGetFirstAttributeOffset)
     };
     V v;
     cr.accept(&v, 0);
+    // fixture（jdk8/AllInstructions）携带 SourceFile 属性；此前记录了回调却不检查（空跑）
+    EXPECT_TRUE(v.sourceOk) << "SourceFile attribute not visited";
 }
 
 // ---- Version validation ----
