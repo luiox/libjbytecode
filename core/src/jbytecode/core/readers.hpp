@@ -90,7 +90,8 @@ public:
     ClassReader(ca::str::Utf8StringArena& arena, std::istream& inputStream);
 
     /// @param arena         Borrowed UTF-8 storage for strings decoded by this reader.
-    /// @param classFilePath Path read completely during construction.
+    /// @param classFilePath Path read completely during construction. Interpreted as UTF-8;
+    ///                      non-ASCII paths open correctly on Windows.
     ClassReader(ca::str::Utf8StringArena& arena, const std::string& classFilePath);
 
     /// @param arena             Borrowed UTF-8 storage for strings decoded by this reader.
