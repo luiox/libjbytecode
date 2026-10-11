@@ -6,10 +6,12 @@
 #include "jbytecode/core/type.hpp"
 #include "jbytecode/core/type_reference.hpp"
 #include "jstr/conversion.hpp"
+#include "libca/str/os_string.hpp"
 #include <cstring>
 #include <stdexcept>
 #include <cfloat>
 #include <cmath>
+#include <filesystem>
 #include <fstream>
 #include <iterator>
 
@@ -32,7 +34,17 @@ std::vector<u8> readAll(std::istream& inputStream)
 
 std::vector<u8> readFileBytes(const std::string& classFilePath)
 {
+    // Windows 窄字符文件 API 按 ANSI 代码页解释路径，而本库 std::string 约定为 UTF-8：
+    // 非 ASCII（中文/emoji）路径直接喂窄 ifstream 会打不开或落到乱码文件名
+    // （同 libca PR #250 zip 模块的修法）。Windows 先转 UTF-16 走 path 宽构造，
+    // POSIX 路径即字节序列，原样直开。
+#if defined(_WIN32)
+    const std::filesystem::path nativePath(
+        OsString::from_utf8_lossy(classFilePath).into_wstring());
+    std::ifstream input(nativePath, std::ios::binary);
+#else
     std::ifstream input(classFilePath, std::ios::binary);
+#endif
     if (!input) throw std::invalid_argument("Class file not found: " + classFilePath);
     return readAll(input);
 }
