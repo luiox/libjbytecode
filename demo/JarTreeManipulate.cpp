@@ -276,6 +276,10 @@ int main()
     std::cout << "=== Tree-API Direct Node Manipulation Demo ===\n\n";
 
     auto          jarBytes = readFile(jarPath);
+    if (jarBytes.empty()) {
+        std::cerr << "Error: cannot read JAR file: " << jarPath << "\n";
+        return 1;
+    }
     MemorySegment jarSeg(jarBytes);
     auto          archive = ZipIO::readJvm(jarSeg);
     std::cout << "Entries: " << archive.getLocalFiles().size() << "\n\n";

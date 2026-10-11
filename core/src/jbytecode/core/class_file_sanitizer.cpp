@@ -554,22 +554,22 @@ void validateRefs(Sanitizer& s, std::vector<std::vector<u32>>& adj)
     adj.assign(cpCount, {});
     for (const RefCheck& ref : s.refs()) {
         const char* owner   = ref.srcIdx != 0 ? "cp[%u] " : "";   // 结构级引用无 CP 归属
-        u32         ownerIdx = refOwnerIndex(ref);
+        const u32   ownerIdx = refOwnerIndex(ref);
         if (ref.targetIdx == 0) {
-            s.add(SanitizeIssueKind::RefIndexOutOfRange, refOwnerIndex(ref),
+            s.add(SanitizeIssueKind::RefIndexOutOfRange, ownerIdx,
                   refOffsetOf(s, ref), "%s%s=0 (null reference)", owner,
                   ref.label.c_str());
             continue;
         }
         if (ref.targetIdx >= cpCount) {
-            s.add(SanitizeIssueKind::RefIndexOutOfRange, refOwnerIndex(ref),
+            s.add(SanitizeIssueKind::RefIndexOutOfRange, ownerIdx,
                   refOffsetOf(s, ref), "%s%s=%u out of range [1,%u)", owner,
                   ref.label.c_str(), ref.targetIdx, cpCount);
             continue;
         }
         const u8 tag = s.entryTag()[ref.targetIdx];
         if (tag == 0) {
-            s.add(SanitizeIssueKind::RefIndexOutOfRange, refOwnerIndex(ref),
+            s.add(SanitizeIssueKind::RefIndexOutOfRange, ownerIdx,
                   refOffsetOf(s, ref), "%s%s=%u -> long/double reserved slot", owner,
                   ref.label.c_str(), ref.targetIdx);
             continue;
@@ -577,7 +577,7 @@ void validateRefs(Sanitizer& s, std::vector<std::vector<u32>>& adj)
         if ((maskOf(tag) & ref.expectedMask) == 0) {
             char expect[64];
             expectedNames(ref.expectedMask, expect, sizeof(expect));
-            s.add(SanitizeIssueKind::RefTagMismatch, refOwnerIndex(ref), refOffsetOf(s, ref),
+            s.add(SanitizeIssueKind::RefTagMismatch, ownerIdx, refOffsetOf(s, ref),
                   "%s%s=%u -> expected %s, got %s", owner, ref.label.c_str(), ref.targetIdx,
                   expect, tagName(tag));
             continue;

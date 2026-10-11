@@ -15,8 +15,9 @@ libjbytecode 是 **OW2 ASM（`org.objectweb.asm`）的 C++17 移植**，提供 J
 
 几条贯穿全库的基调，先记住它们，后面所有设计都从这里推导：
 
-- **全局禁用 RTTI。** 编译期 `/GR-`（MSVC）/ `-fno-rtti`。所有「向下转型」一律用
-  `typed::cast<T>()`（libtyped 提供的基于 tag 的安全转型），不用 `dynamic_cast`。
+- **规避 RTTI（约定层面）。** 构建当前不强制 `/GR-`（MSVC）/ `-fno-rtti`，但全库
+  约束不使用 `dynamic_cast` / `typeid`：所有「向下转型」一律用
+  `ca::core::tag_cast::cast<T>()`（libca core 提供的基于 tag 的安全转型）。
   这影响到指令节点、Value、Attribute 等所有多态层级的类型判别方式。
 - **Visitor（访问者）是一切的中枢。** 读、写、变换、打印、校验，全部表达为同一套
   visitor 事件流的生产者/消费者。理解了 visitor 链，就理解了全库的数据流。
@@ -52,7 +53,7 @@ libjbytecode 是 **OW2 ASM（`org.objectweb.asm`）的 C++17 移植**，提供 J
 ```
 
 - **core** 只依赖 libca（基础类型/字符串/SHA-1）与 libjstr。它是地基，不依赖其它子模块。
-- **tree / commons / util / analysis** 都建立在 core 之上，并额外依赖 libtyped（`typed::cast`）。
+- **tree / commons / util / analysis** 都建立在 core 之上，并复用 libca 的 `ca::core::tag_cast`。
 - **analysis** 还依赖 tree（分析的输入是 tree 的 `MethodNode`）。
 - **util** 的字节码校验部分也会用到 analysis。
 
@@ -189,8 +190,8 @@ ASM 跑在有 GC 的 JVM 上，这个移植没有 GC，所以所有权规则必�
   `MethodNode::createLabel()` 在 `nodeArena_` 建点、随 arena 回收。visitor 边界
   `canonicalizeLabel`：本域 label O(1) 直返，外来 label 拷贝收编（原对象归创建方）。
   旧「label 池 + taken 标志 + onNodeAdded 回调」制度已物理退役。详见 §6.1。
-- **向下转型走 `typed::cast<T>()`**，不是 `dynamic_cast`。判别指令/Value 的具体类型时，
-  用各类提供的 tag（如指令节点的 `getType()`、Value 的种类枚举）配合 `typed::cast`。
+- **向下转型走 `ca::core::tag_cast::cast<T>()`**（libca core），不是 `dynamic_cast`。判别指令/Value 的具体类型时，
+  用各类提供的 tag（如指令节点的 `getType()`、Value 的种类枚举）配合 `tag_cast`。
 - **字符串用 libca 的语义类型**（`Utf8StringRef` 借用 / `Utf8String` 拥有），不是
   `std::string`。借用型不延长生命周期，注意别让底层 buffer 先析构。
 - **常量池由 `SymbolTable` 统一注册去重**，不是各处自己拼。写出侧的常量池序列化是
@@ -230,8 +231,8 @@ ASM 跑在有 GC 的 JVM 上，这个移植没有 GC，所以所有权规则必�
 ## 7. 构建与测试形态
 
 - 子库目标：`libjbytecode_core` / `_tree` / `_commons` / `_analysis` / `_util`，
-  聚合目标 `libjbytecode`。最小可用只需 core（+ libca/zlib submodule）。
-- 测试默认关闭，`xmake f --with_tests=y` 打开；demo 默认关闭，`--with_demos=y` 打开。
+  聚合目标 `libjbytecode`。最小可用只需 core（+ libca / libjstr / libgarena 包）。
+- 测试默认关闭，`xmake f --with_tests=y` 打开；demo 默认关闭，`--with_demo=y` 打开。
 - 每个子模块有独立的 `*_unittest` 目标；core 另有一份与 ASM 参考输出做结构化对拍的回归测试。
 - 具体命令见 `readme.md`「构建目标」与「快速开始」。
 
@@ -249,6 +250,5 @@ ASM 跑在有 GC 的 JVM 上，这个移植没有 GC，所以所有权规则必�
 | Analysis 的 Analyzer + Interpreter 数据流框架 | [analysis.md](analysis.md) |
 | Util 的 Printer/Textifier/ASMifier、Trace、Check | [util.md](util.md) |
 | **迭代器失效、accept 事件顺序、线程/异常安全（写变换前必读）** | [safety.md](safety.md) |
-| 未完成事项与已知差距 | [../dev_plan.md](../dev_plan.md) |
 | 每个类的精确 API、参数、语义、对应的 ASM Java 源 | **各头文件的 Doxygen 注释（以代码为准）** |
 

@@ -1,4 +1,3 @@
-#include <fstream>
 #include <iostream>
 #include <vector>
 #include <cstdint>
@@ -16,18 +15,6 @@ using namespace jbytecode::commons;
 using namespace jbytecode::util;
 using namespace ca::str;
 
-
-static std::vector<uint8_t> readFile(const std::string& path)
-{
-    std::ifstream in(path, std::ios::binary);
-    if (!in) return {};
-    in.seekg(0, std::ios::end);
-    auto sz = static_cast<size_t>(in.tellg());
-    in.seekg(0, std::ios::beg);
-    std::vector<uint8_t> d(sz);
-    in.read(reinterpret_cast<char*>(d.data()), static_cast<std::streamsize>(sz));
-    return d;
-}
 
 class TimingAdapter : public AdviceAdapter
 {
@@ -92,7 +79,13 @@ int main()
     test::setup("libjbytecode");
     Utf8StringArena arena;
 
-    auto input = test::getResource("AllFrames.class");
+    // 独立仓迁移后 test_resource 只在 core/ asm-test/ 子目录，走 asm-test 定位
+    const std::string classRel = "test_resource/origin/jdk8/AllFrames.class";
+    if (!test::hasAsmTestResource(classRel)) {
+        std::cerr << "Error: asm-test resource missing: " << classRel << "\n";
+        return 1;
+    }
+    auto input = test::getAsmTestResource(classRel);
     if (input.empty()) {
         std::cerr << "Error: cannot read file\n";
         return 1;

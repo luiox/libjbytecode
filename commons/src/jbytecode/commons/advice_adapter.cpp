@@ -169,40 +169,34 @@ void AdviceAdapter::visitInsn(int opcode)
         case Opcodes::DUP: pushValue(peekValue()); break;
         case Opcodes::DUP_X1:
         {
-            int sz = (int)stackFrame_.size();
             stackFrame_.insert(stackFrame_.end() - 2, stackFrame_.back());
             break;
         }
         case Opcodes::DUP_X2:
         {
-            int sz = (int)stackFrame_.size();
             stackFrame_.insert(stackFrame_.end() - 3, stackFrame_.back());
             break;
         }
         case Opcodes::DUP2:
         {
-            int sz = (int)stackFrame_.size();
             stackFrame_.insert(stackFrame_.end() - 2, stackFrame_.back());
             stackFrame_.insert(stackFrame_.end() - 2, stackFrame_.back());
             break;
         }
         case Opcodes::DUP2_X1:
         {
-            int sz = (int)stackFrame_.size();
             stackFrame_.insert(stackFrame_.end() - 3, stackFrame_.back());
             stackFrame_.insert(stackFrame_.end() - 3, stackFrame_.back());
             break;
         }
         case Opcodes::DUP2_X2:
         {
-            int sz = (int)stackFrame_.size();
             stackFrame_.insert(stackFrame_.end() - 4, stackFrame_.back());
             stackFrame_.insert(stackFrame_.end() - 4, stackFrame_.back());
             break;
         }
         case Opcodes::SWAP:
         {
-            int sz = (int)stackFrame_.size();
             stackFrame_.insert(stackFrame_.end() - 2, stackFrame_.back());
             stackFrame_.erase(stackFrame_.end() - 1);
             break;

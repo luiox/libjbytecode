@@ -105,7 +105,7 @@ field/method identity、指令类型与 opcode、maxStack/maxLocals、异常表�
 
 这些二进制差异不能单独判定为功能缺陷。若新增 byte-exact 场景，必须单独定义比较对象、
 允许差异和 JVM verify/行为验收，不能弱化现有结构回归断言。测试资源和 ASM 参考回放的
-生成方法见 [`script/roundtrip_verifier/README.md`](../../../script/roundtrip_verifier/README.md)。
+生成工具不在本仓库内。
 
 ## 已知限制
 

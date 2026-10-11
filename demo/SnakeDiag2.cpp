@@ -28,6 +28,10 @@ int main()
     ca::str::Utf8StringArena arena;
 
     auto buf = readFile("Snake.class");
+    if (buf.empty()) {
+        std::cerr << "Cannot open Snake.class\n";
+        return 1;
+    }
     std::cout << "Step 1: Read " << buf.size() << " bytes\n";
 
     std::cout << "Step 2: Construct ClassReader...\n";
