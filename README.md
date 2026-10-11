@@ -1,32 +1,90 @@
 # libjbytecode
 
-OW2 ASM 的 C++ 移植，提供 Java `.class` 字节码的解析、生成、分析与变换能力。
+OW2 ASM 的 C++17 移植：Java `.class` 字节码的解析、生成、分析与变换库（xmake）。
 
 - **语言**：C++17，规避 RTTI（向下转型用 libca 的 `ca::core::tag_cast::cast<T>`，不用 `dynamic_cast`）
-- **构建系统**：Xmake（≥ 3.0）
 - **命名空间**：`jbytecode`（子模块 `jbytecode::core` / `::tree` / `::commons` / `::analysis` / `::util`）
-- **统一入口**：`#include <jbytecode/jbytecode.hpp>`（聚合头文件，可按需单独包含子模块）
+- **统一入口**：`#include <jbytecode/jbytecode.hpp>`（聚合头，也可按需单独包含子模块头）
 - **线程安全**：所有 API 均线程不安全，单线程使用或外部加锁
+
+## 特性速览
+
+| 能力 | 内容 |
+|------|------|
+| Core API | Visitor 模式流式读写 `.class`：`ClassReader` / `ClassWriter`、`Opcodes`、`Type`、符号表、栈帧计算、输入净化 |
+| Tree API | 内存中 class 树形表示：`ClassNode` / `MethodNode` / `InsnList`，可直接增删改指令后写回 |
+| Commons | 常用适配器：`Remapper`、`GeneratorAdapter`、`AdviceAdapter` 等 |
+| Analysis | 数据流分析引擎：`Analyzer` + `Interpreter` + `Frame` / `Value` |
+| Util | 调试与验证：`Textifier`、`ASMifier`、`TraceClassVisitor`、`CheckAdapter` |
 
 ## 架构
 
 ```
 libjbytecode (聚合静态库)
-├── core/      Core API —— Visitor 模式读写 .class（ClassReader/Writer、Opcodes、Type、SymbolTable、ClassFileSanitizer 输入净化 #963）
-├── tree/      Tree API —— 内存中 class 树形表示（ClassNode/MethodNode/InsnList）
+├── core/      Core API —— Visitor 模式读写 .class
+├── tree/      Tree API —— 内存树形表示（ClassNode/MethodNode/InsnList）
 ├── commons/   实用适配器（Remapper、GeneratorAdapter、AdviceAdapter 等）
 ├── analysis/  数据流分析引擎（Analyzer、Interpreter、Frame、Value）
 └── util/      调试/追踪/验证工具（Printer、Textifier、ASMifier、CheckAdapter、TraceClassVisitor）
 ```
 
-依赖链：`core`（依赖 libca / libjstr / libgarena 包）→ `tree`/`commons`/`analysis`/`util`（依赖 core）。
+依赖链：`core`（依赖 libca / libjstr / libgarena 包）→ `tree` / `commons` / `analysis` / `util`（依赖 core）。
 聚合库 `libjbytecode` 串联全部子库并对外暴露统一头文件。
 
-## 构建
+## 快速开始
 
-xmake ≥ 3.0。libca / libjstr / libgarena / libjzip 经
-[luiox-repo](https://github.com/luiox/luiox-repo) git 直连包解析，gtest 走 xrepo。
-首次构建先注册包仓库：
+**1. 注册包仓库**（libjbytecode 及其依赖经 [luiox-repo](https://github.com/luiox/luiox-repo) git 直连包分发）：
+
+```sh
+xmake repo --add luiox-repo https://github.com/luiox/luiox-repo.git
+```
+
+**2. 在你的 `xmake.lua` 中引入**（版本锁写法参考本仓库根 `xmake.lua`）：
+
+```lua
+add_requires("libjbytecode 0.0.1")
+
+target("myapp")
+    set_kind("binary")
+    add_files("src/*.cpp")
+    add_packages("libjbytecode")
+```
+
+**3. 最小示例** —— 读取 `.class`、遍历指令、写回：
+
+```cpp
+#include <jbytecode/jbytecode.hpp>
+using namespace jbytecode;
+using namespace jbytecode::core;
+
+// arena 借宿常量池解码出的 UTF-8 字符串，生命周期需覆盖 reader/writer
+ca::str::Utf8StringArena arena;
+
+std::vector<ca::u8> bytes = /* 自行读入 .class 字节 */;
+
+// 直通回放：读取 → 写出
+ClassReader reader(arena, bytes.data(), (ca::i32)bytes.size());
+ClassWriter writer(arena);
+reader.accept(&writer, /*parsingOptions=*/0);
+std::vector<ca::u8> out = writer.toByteArray();
+
+// Tree API：读取 → 修改 → 写回
+tree::ClassNode cn;
+reader.accept(&cn, 0);
+for (auto* m : cn.methods) {
+    for (auto* insn = m->instructions.getFirst(); insn; insn = insn->getNext()) {
+        // 遍历指令，如 insn->getOpcode()
+    }
+}
+auto* method = cn.methods[0];
+method->instructions.insert(method->instructions.getFirst(),
+                            new tree::InsnNode(Opcodes::ACONST_NULL));
+cn.accept(&writer);
+```
+
+## 构建与测试
+
+本仓库自建（xmake ≥ 3.0，依赖包经 luiox-repo git 直连解析，gtest 走 xrepo）：
 
 ```sh
 xmake repo --add luiox-repo https://github.com/luiox/luiox-repo.git
@@ -36,7 +94,7 @@ xmake build libjbytecode_asm_core_unittest
 xmake run libjbytecode_asm_core_unittest
 ```
 
-## 构建目标
+构建目标：
 
 | 目标 | 类型 | 说明 |
 |------|------|------|
@@ -46,25 +104,8 @@ xmake run libjbytecode_asm_core_unittest
 | `libjbytecode_origin_unittest` | 测试 | core 单元测试（同 asm_core 源，独立 target） |
 | `demo_*` | 可执行 | 各类用法示例（默认关闭，`--with_demo=y`） |
 
-```bash
-# 最小构建（libca / libjstr / libgarena 由 luiox-repo 包自动拉取）
-xmake build libjbytecode_core
-
-# 完整库 + 测试
-xmake f --with_tests=y
-xmake build libjbytecode && xmake run libjbytecode_asm_core_unittest
-```
-
-## 测试纪律
-
-- 测试资源由仓库外的生成脚本（ASM 参考回放）产生，生成过程只写
-  `test/`，不得直接写入 `test_resource/`。
-- 对齐型测试的期望值必须来自参考实现、预编译样本，或可自证的生成型 probe。
-- 默认 round-trip 契约是结构与指令语义一致；常量池顺序、属性布局和等价帧编码不要求
-  与 ASM Java 逐字节一致。具体边界见 [doc/safety.md](doc/safety.md#round-trip-验证边界)。
-- 仓库内理应提交的 `test_resource/` / `test_resource/origin/` fixture 若缺失，测试应直接失败，不能用 `skip` 掩盖资源不完整。
-- `skip` 只允许用于明确的外部环境前提不满足，并且必须打印具体原因；“路径不存在”“样本未提交”不属于合法 `skip` 理由。
-- 占位断言、弱化断言、或“找不到合适资源就跳过”的测试，都应视为待清理技术债，而不是可接受现状。
+测试纪律（资源来源、round-trip 契约边界、`skip` 使用限制）见
+[doc/safety.md](doc/safety.md#round-trip-验证边界)。
 
 ## 依赖
 
@@ -76,32 +117,13 @@ xmake build libjbytecode && xmake run libjbytecode_asm_core_unittest
 | libjzip | demo | Jar 读写（仅 `--with_demo=y`） |
 | gtest | 测试 | 单元测试（仅 `--with_tests=y`，走 xrepo） |
 
-## 快速开始
+## 状态与 License
 
-```cpp
-#include <jbytecode/jbytecode.hpp>
-using namespace jbytecode;
-using namespace jbytecode::core;
+- **开发中，未定版**：尚无发布 tag，API 可能调整；包版本以 `xmake.lua` 的 `add_requires` 版本锁为准。
+- 依赖包 libjstr / libgarena 转公开之前，匿名环境（如托管 CI runner）拉包构建会失败，属预期。
+- 基于 [MIT License](LICENSE) 发布。
 
-// arena 借宿常量池解码出的 UTF-8 字符串，生命周期需覆盖 reader/writer
-ca::str::Utf8StringArena arena;
-
-// 直通回放：读取 → 写出
-std::vector<ca::u8> bytes = /* 读 .class */;
-ClassReader reader(arena, bytes.data(), (ca::i32)bytes.size());
-ClassWriter writer(arena);
-reader.accept(&writer, /*parsingOptions=*/0);
-std::vector<ca::u8> out = writer.toByteArray();
-
-// Tree API：读取 → 修改 → 写回
-tree::ClassNode cn;
-reader.accept(&cn, 0);
-auto* m = cn.methods[0];
-m->instructions.insert(m->instructions.getFirst(), new tree::InsnNode(Opcodes::ACONST_NULL));
-cn.accept(&writer);
-```
-
-## 文档
+## 深入阅读
 
 | 文档 | 内容 |
 |------|------|
