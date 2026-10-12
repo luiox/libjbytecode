@@ -1,0 +1,22 @@
+libjbytecode
+Copyright (c) 2026 luiox
+
+This product is an independent C++17 implementation of the JVM classfile
+reading/writing/transform pipeline. It is API-compatible with, and behaviourally
+validated against, ObjectWeb ASM (https://github.com/JetBrains/asm), but it is
+not a derivative work of it: libjbytecode implements its own parser, tree model,
+visitor framework and bytecode writers. The round-trip boundary is documented in
+doc/safety.md — notably, identical input does NOT guarantee byte-identical
+output versus the ASM Java implementation.
+
+Earlier revisions of this library contained two functions derived from
+ObjectWeb ASM (`Constants::isWhitelisted()` and `Constants::checkIsPreview()`,
+originally marked in-source as "Ported from org.objectweb.asm.Constants").
+Those functions were unused by the library and by all of its consumers, and
+they have been removed. No ASM-derived code remains in this source tree.
+
+Third-party dependencies are declared in xmake.lua and are not vendored here.
+
+Portions of the test suite reference vectors and expectations published in the
+JVM Specification (JVMS) and FIPS 46-3; these are factual standards documents,
+not copyrighted source code.

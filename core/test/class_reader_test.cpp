@@ -1332,7 +1332,7 @@ TEST(ClassReaderTest, preservesUnpairedSurrogateLdcAcrossRoundTrip)
     EXPECT_EQ(stringOf(*afterValue), expected);
 }
 
-// 回归测试（main linux CI mj2x_unittest 段错误根因）：readCode 曾以
+// 回归测试（main linux CI 上游单测 段错误根因）：readCode 曾以
 // `readConst(...).as<Handle>()` 读取 indy 的 bootstrap method handle——readConst
 // 返回的临时 Any 在语句末析构即 delete 内部 Handle，下一行 `*bsmHandlePtr` 是
 // use-after-free。glibc（≥2.34）free 会覆写已释放块前 16 字节

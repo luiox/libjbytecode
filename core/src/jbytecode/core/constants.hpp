@@ -4,7 +4,6 @@
 #include "jbytecode/core/opcodes.hpp"
 #include "libca/str/utf8_string.hpp"
 #include <set>
-#include <string>
 #include <vector>
 
 namespace jbytecode::core {
@@ -16,9 +15,6 @@ namespace jbytecode::core {
 ///  (ILOAD_0…ALOAD_3, ISTORE_0…ASTORE_3, WIDE, GOTO_W, JSR_W, LDC_W, LDC2_W).
 ///  These are the actual values that appear in .class byte streams;
 ///  they are distinct from Opcodes ASM-level abstract opcodes.
-///
-///  Also provides isWhitelisted() and checkAsmExperimental() equivalents
-///  matching ASM's Constants.java.
 ///
 ///  IMPORTANT: When adding a new attribute name constant, add it to the
 ///  FOREACH_ATTR_NAME macro below AND update the expected set in
@@ -221,20 +217,6 @@ public:
 
 private:
     Constants() = delete;
-
-public:
-    /// Check if a class is whitelisted for ASM10_EXPERIMENTAL usage.
-    /// Ported from org.objectweb.asm.Constants.isWhitelisted().
-    static bool isWhitelisted(const std::string& internalName);
-
-    /// Check if a class file has the preview feature flag (minor == 0xFFFF).
-    /// Ported from org.objectweb.asm.Constants.checkIsPreview().
-    /// C++ adaptation: accepts raw byte buffer instead of InputStream.
-    ///
-    /// @param data  pointer to class file bytes (may be nullptr)
-    /// @param len   number of available bytes
-    /// @throws std::runtime_error if data is null, too short, or not a preview class
-    static void checkIsPreview(const ca::u8* data, ca::i32 len);
 };
 
 }   // namespace jbytecode::core

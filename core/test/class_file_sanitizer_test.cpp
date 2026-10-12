@@ -2,7 +2,7 @@
 //
 // 本文件只覆盖净化器自身的基础行为（合法零误报 / 结构诊断 / join 契约），
 // 全量恶意样本族由 mtest_set malformedFixtureManifest 承载，消费测试在
-// mjt-deobf/test/classfile_sanitize_test.cpp。
+// 上游反混淆项目的 classfile_sanitize_test.cpp。
 
 #include <vector>
 

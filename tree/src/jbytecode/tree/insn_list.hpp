@@ -455,7 +455,7 @@ private:
     /// （内嵌 MethodNode、由 libjbytecode 本体方法就地改写、消费方经内联访问器
     /// 读写）：门控声明使 NDEBUG TU 与非 NDEBUG TU 的 size_ 等成员偏移漂移 8 字节
     /// （ODR 违规），混链后消费方 size() 读到 ownerArena_ 低半（垃圾堆地址）、
-    /// 析构走错位字段——mj2x_unittest LlvmIrBackendTest 堆损坏实证（测试 target
+    /// 析构走错位字段——上游单测 LlvmIrBackendTest 堆损坏实证（测试 target
     /// 去 NDEBUG #1063 后显形）。字段恒在（两种构建 sizeof 一致），release 无读写。
     /// 声明须先于 Iterator：MSVC 对嵌套类内联体引用后置类成员报 C2039。
     mutable int activeIterators_ = 0;

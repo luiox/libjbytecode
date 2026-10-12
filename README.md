@@ -112,3 +112,7 @@ cn.accept(&writer);
 | [doc/util.md](doc/util.md) | Util 设计：Printer/Textifier/ASMifier、Trace、CheckAdapter |
 | [doc/safety.md](doc/safety.md) | 安全使用指南：迭代器失效、accept 链契约、线程/异常安全 |
 | [dev_plan.md](dev_plan.md) | 未完成事项与已知差距 |
+
+## License
+
+MIT

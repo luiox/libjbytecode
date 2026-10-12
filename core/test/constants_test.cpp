@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 #include <set>
 #include <vector>
-#include <string>
-#include <algorithm>
 #include "jbytecode/core/opcodes.hpp"
 #include "jbytecode/core/constants.hpp"
 
@@ -381,36 +379,3 @@ TEST(ConstantsTest, testOpcodes)
     }
 }
 
-TEST(ConstantsTest, testIsWhitelisted)
-{
-    ASSERT_FALSE(Constants::isWhitelisted("org/jacoco/core/internal/flow/ClassProbesVisitor"));
-    ASSERT_FALSE(Constants::isWhitelisted("org/objectweb/asm/ClassWriter"));
-    ASSERT_FALSE(Constants::isWhitelisted("org/objectweb/asm/util/CheckClassVisitor"));
-    ASSERT_FALSE(Constants::isWhitelisted("org/objectweb/asm/ClassWriterTest"));
-    ASSERT_TRUE(Constants::isWhitelisted("org/objectweb/asm/ClassWriterTest$DeadCodeInserter"));
-    ASSERT_TRUE(Constants::isWhitelisted("org/objectweb/asm/util/TraceClassVisitor"));
-    ASSERT_TRUE(Constants::isWhitelisted("org/objectweb/asm/util/CheckClassAdapter"));
-}
-
-TEST(ConstantsTest, testCheckIsPreview_nullStream)
-{
-    ASSERT_THROW(Constants::checkIsPreview(nullptr, 0), std::runtime_error);
-}
-
-TEST(ConstantsTest, testCheckIsPreview_invalidStream)
-{
-    unsigned char invalidData[4] = {0, 0, 0, 0};
-    ASSERT_THROW(Constants::checkIsPreview(invalidData, 4), std::runtime_error);
-}
-
-TEST(ConstantsTest, testCheckIsPreview_nonPreviewClass)
-{
-    unsigned char nonPreviewData[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    ASSERT_THROW(Constants::checkIsPreview(nonPreviewData, 8), std::runtime_error);
-}
-
-TEST(ConstantsTest, testCheckIsPreview_previewClass)
-{
-    unsigned char previewData[6] = {0, 0, 0, 0, 0xFF, 0xFF};
-    ASSERT_NO_THROW(Constants::checkIsPreview(previewData, 6));
-}
