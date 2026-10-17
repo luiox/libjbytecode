@@ -10,17 +10,18 @@ void AnnotationNode::visit(ca::str::Utf8StringRef name, const ca::core::Any& val
     if (value.is<std::string>()) {
         el.tag        = 's';
         const auto& s = value.cast<std::string>();
-        el.sval = ca::str::Utf8String(reinterpret_cast<const unsigned char*>(s.data()), s.size());
+        el.sval = ca::str::Utf8String::from_data_unchecked(
+            reinterpret_cast<const unsigned char*>(s.data()), s.size());
     }
     else if (value.is<ca::str::Utf8StringRef>()) {
         el.tag       = 's';
         const auto s = value.cast<ca::str::Utf8StringRef>();
-        el.sval      = ca::str::Utf8String(s.data(), s.byte_length());
+        el.sval      = ca::str::Utf8String::from_data_unchecked(s.data(), s.byte_length());
     }
     else if (value.is<ca::str::ZUtf8StringRef>()) {
         el.tag       = 's';
         const auto s = value.cast<ca::str::ZUtf8StringRef>().ref();
-        el.sval      = ca::str::Utf8String(s.data(), s.byte_length());
+        el.sval      = ca::str::Utf8String::from_data_unchecked(s.data(), s.byte_length());
     }
     else if (value.is<int>()) {
         el.tag  = 'I';
@@ -60,7 +61,7 @@ void AnnotationNode::visit(ca::str::Utf8StringRef name, const ca::core::Any& val
         // owner 上下文——按裁决①给显式函数级局部 arena，零驻留。
         ca::str::Utf8StringArena scratch;
         const auto               d = value.cast<Type>().getDescriptor(scratch);
-        el.sval                    = ca::str::Utf8String(d.data(), d.byte_length());
+        el.sval = ca::str::Utf8String::from_data_unchecked(d.data(), d.byte_length());
     }
     else {
         el.tag = 's';
@@ -76,7 +77,8 @@ void AnnotationNode::visitEnum(ca::str::Utf8StringRef name, ca::str::Utf8StringR
     el.tag  = 'e';
     ca::str::Utf8StringBuilder sb;
     sb.append(desc).append(" ").append(value);
-    el.sval = sb.build();
+    // build_or_empty 对非法 UTF-8 返回空串（不抛），避免 WTF-8 孤立代理炸掉验证。
+    el.sval = sb.build_or_empty();
     elements.push_back(std::move(el));
 }
 
