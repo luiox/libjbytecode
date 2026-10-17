@@ -75,10 +75,17 @@ void AnnotationNode::visitEnum(ca::str::Utf8StringRef name, ca::str::Utf8StringR
     Element el;
     el.name = name;
     el.tag  = 'e';
-    ca::str::Utf8StringBuilder sb;
-    sb.append(desc).append(" ").append(value);
-    // build_or_empty 对非法 UTF-8 返回空串（不抛），避免 WTF-8 孤立代理炸掉验证。
-    el.sval = sb.build_or_empty();
+    // 与 visit 字符串面同款字节直存：desc/value 是 classfile 原始字节，允许
+    // 非 UTF-8（混淆样本常见 WTF-8 孤立代理），build_or_empty 校验失败会静默
+    // 清空整段载荷；accept 侧按首个空格字节切分，保字节即可无损往返。
+    const auto                 descLen  = desc.byte_length();
+    const auto                 valueLen = value.byte_length();
+    std::vector<unsigned char> raw;
+    raw.reserve(descLen + 1 + valueLen);
+    raw.insert(raw.end(), desc.data(), desc.data() + descLen);
+    raw.push_back(' ');
+    raw.insert(raw.end(), value.data(), value.data() + valueLen);
+    el.sval = ca::str::Utf8String::from_data_unchecked(raw.data(), raw.size());
     elements.push_back(std::move(el));
 }
 
