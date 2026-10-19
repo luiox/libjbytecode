@@ -2,7 +2,7 @@
 --
 -- 依赖：
 --   - libca（luiox-repo git 直连包）：core/str/log/crypto 为运行依赖，test 为
---     测试门面依赖；版本锁固定 0.0.15，升级须显式换版。
+--     测试门面依赖；版本锁固定 0.0.16，升级须显式换版。
 --   - libjstr / libgarena（luiox-repo git 直连包）：core 子库的编码与 arena 底座。
 --   - libjzip（luiox-repo git 直连包）：仅 --with_demo=y（Jar 系 demo）。
 --   - gtest（xrepo，仅 --with_tests=y）。
@@ -15,7 +15,7 @@
 set_languages("cxx17")
 add_rules("mode.debug", "mode.release")
 
-add_requires("libca 0.0.15", {configs = {modules = "core,str,log,crypto,test"}})
+add_requires("libca 0.0.16", {configs = {modules = "core,str,log,crypto,test"}})
 add_requires("libjstr 0.0.2")
 add_requires("libgarena 0.0.2")
 
