@@ -42,11 +42,20 @@ std::vector<u8> readFileBytes(const std::string& classFilePath)
     const std::filesystem::path nativePath(
         OsString::from_utf8_lossy(classFilePath).into_wstring());
     std::ifstream input(nativePath, std::ios::binary);
+    if (!input) {
+        // lossy 判定：转回 UTF-8 与原串不等 ⇔ 存在被替换的非法字节，路径已改写
+        const bool lossy =
+            OsString::from_utf8_lossy(classFilePath).into_utf8_string().to_std_string() != classFilePath;
+        std::string message = "Class file not found: " + classFilePath;
+        if (lossy) message += " (path converted lossily: std::string path convention is UTF-8)";
+        throw std::invalid_argument(message);
+    }
+    return readAll(input);
 #else
     std::ifstream input(classFilePath, std::ios::binary);
-#endif
     if (!input) throw std::invalid_argument("Class file not found: " + classFilePath);
     return readAll(input);
+#endif
 }
 
 Utf8StringRef normalizeFieldDescriptor(Utf8StringArena&      arena,
