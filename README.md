@@ -42,7 +42,7 @@ xmake repo --add luiox-repo https://github.com/luiox/luiox-repo.git
 **2. 在你的 `xmake.lua` 中引入**（版本锁写法参考本仓库根 `xmake.lua`）：
 
 ```lua
-add_requires("libjbytecode 0.0.1")
+add_requires("libjbytecode")
 
 target("myapp")
     set_kind("binary")
