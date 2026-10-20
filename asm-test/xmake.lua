@@ -5,7 +5,7 @@ target("libjbytecode_core_unittest")
     set_kind("binary")
     set_default(false)
     add_deps("libjbytecode_util", "libjbytecode_commons", "libjbytecode_analysis",
-             "libjbytecode_tree", "libjbytecode_core")
+             "libjbytecode_tree", "libjbytecode_core", "libjbytecode")
     add_packages("libca", "libjstr", "libgarena", "gtest")
     add_files("src/main.cpp")
     add_files("src/extensions/core/*_test.cpp")

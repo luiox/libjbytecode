@@ -40,22 +40,5 @@ target("libjbytecode_asm_core_unittest")
         add_syslinks("pthread")
     end
 end
-if has_config("with_tests") then
-target("libjbytecode_origin_unittest")
-    set_kind("binary")
-    set_default(false)
-
-    add_deps("libjbytecode_core")
-    add_packages("libca", "libjstr", "libgarena", "gtest")
-    add_files(unittest_files)
-    add_includedirs(unittest_incs)
-    set_rundir("$(projectdir)")
-    if is_plat("windows") then
-        add_cxflags("/utf-8", {tools = "cl"})
-    end
-    if is_plat("linux") then
-        add_syslinks("pthread")
-    end
-end
 
 includes("test/crossval")

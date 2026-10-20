@@ -113,10 +113,12 @@ class TraceAdvice : public AdviceAdapter {
 
 ```cpp
 // 类名重映射
-ClassReader reader(data, len);
-ClassWriter writer;
-ClassRemapper remapper(&writer, new SimpleRemapper("org/old/Foo", "org/new/Foo"));
-reader.accept(&remapper, 0);
+ca::str::Utf8StringArena arena;
+ClassReader              reader(arena, data, len);
+ClassWriter              writer(arena);
+SimpleRemapper           remapper(arena, "org/old/Foo", "org/new/Foo");
+ClassRemapper            cr(&writer, &remapper);
+reader.accept(&cr, 0);
 auto out = writer.toByteArray();
 
 // 代码生成

@@ -36,6 +36,9 @@ namespace jbytecode::core {
 ///
 /// @warning 传入的 arena
 /// 为借用对象，必须长于本 reader 以及持有其 Utf8StringRef 的 visitor/tree。
+/// @warning vector / istream / 路径构造函数会复制传入的字节，reader 持有副本；
+/// 裸指针构造函数只借用调用方缓冲区，调用方必须在 reader 及全部 accept 调用期间
+/// 保持该缓冲区有效。
 /// @warning
 /// 经由本类读取辅助函数访问的偏移和常量池索引会先校验；检测到非法值时抛出
 ///
@@ -95,14 +98,14 @@ public:
     ClassReader(ca::str::Utf8StringArena& arena, const std::string& classFilePath);
 
     /// @param arena             Borrowed UTF-8 storage for strings decoded by this reader.
-    /// @param classFileBuffer   Class bytes copied from this buffer.
+    /// @param classFileBuffer   Borrowed class bytes; must outlive this reader and all accept calls.
     /// @param classFileOffset   Offset of the class bytes in classFileBuffer.
     /// @param classFileLength   Number of bytes to read.
     ClassReader(ca::str::Utf8StringArena& arena, const ca::u8* classFileBuffer,
                 ca::i32 classFileOffset, ca::i32 classFileLength);
 
     /// @param arena           Borrowed UTF-8 storage for strings decoded by this reader.
-    /// @param classFileBuffer Class bytes copied from this buffer.
+    /// @param classFileBuffer Borrowed class bytes; must outlive this reader and all accept calls.
     /// @param classFileLength Number of bytes to read.
     ClassReader(ca::str::Utf8StringArena& arena, const ca::u8* classFileBuffer,
                 ca::i32 classFileLength)
@@ -126,7 +129,8 @@ public:
     ca::i32 getItem(ca::i32 index) const { return index == 0 ? 0 : cpInfoOffset(index); }
     /// @brief 返回常量池槽位总数（含索引 0 保留槽位）。
     ca::i32 getItemCount() const { return constantPoolCount_; }
-    /// @brief 返回解析 UTF-8 常量所需的最大临时缓冲区长度。
+    /// @brief 返回常量池中单个 MUTF-8 常量的最大字节长度。
+    /// 转换结果直接 intern 进 arena，内部不再依赖该长度的临时缓冲区。
     ca::i32 getMaxStringLength() const { return maxStringLength_; }
     /// @brief 返回 classfile 原始字节缓冲区的首地址。
     const ca::u8* getClassFileBuffer() const { return classFileBuffer_; }
@@ -281,7 +285,7 @@ private:
     int                                 maxStringLength_;
     // readElementValue 当前递归深度（含 av == nullptr 的跳过路径）。
     int                                 annotationDepth_ = 0;
-    // -- arena 死亡点声明（memory-governance-plan §5-P1③）--
+    // -- arena 死亡点声明 --
     // 本成员借用调用方拥有的 Utf8StringArena（非本类私有；多 reader/writer 可共享同一 arena）：
     // readUTF8/readClass/readModule/readConst/readUtf 返回的视图、getClassName/getSuperName/
     // getInterfaces 的返回值、constantUtf8Values_ 缓存项，以及 accept() 回调传给

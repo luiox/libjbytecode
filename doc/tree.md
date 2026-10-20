@@ -153,8 +153,11 @@ class InsnList {
     void add(AbstractInsnNode* n);                              // 尾插
     void insert(AbstractInsnNode* loc, AbstractInsnNode* n);    // 在 loc 前插
     void insert(AbstractInsnNode* n);                           // 头插
-    void set(AbstractInsnNode* loc, AbstractInsnNode* n);       // 替换（delete loc）
-    void remove(AbstractInsnNode* n);                           // 摘除（不 delete）
+    void set(AbstractInsnNode* loc, AbstractInsnNode* n);       // 替换（arena 节点只摘链，堆节点 delete）
+    void remove(AbstractInsnNode* n);                           // 只摘链，不销毁
+    void removeAndDelete(AbstractInsnNode* n);                  // 摘链并销毁堆节点（arena 节点只摘链）
+    template <class T, class... Args>
+    T* create(Args&&... args);                                  // 在 owner arena 上建节点
     AbstractInsnNode* getFirst() / getLast();
     AbstractInsnNode* get(int index);
     int size();
@@ -167,17 +170,18 @@ class InsnList {
 
 ```cpp
 // 读取到树、修改、回写
-tree::ClassNode cn;
-ClassReader reader(data, len);
+ca::str::Utf8StringArena arena;
+tree::ClassNode          cn;
+ClassReader              reader(arena, data, len);
 reader.accept(&cn, 0);
 
-// 在方法开头插入指令
+// 在方法开头插入指令：节点由方法 arena 分配，寿命随 MethodNode
 tree::MethodNode* m = cn.methods[0];
 m->instructions.insert(m->instructions.getFirst(),
-    new tree::InsnNode(Opcodes::ACONST_NULL));
+    m->instructions.create<tree::InsnNode>(Opcodes::ACONST_NULL));
 
 // 回写
-ClassWriter writer;
+ClassWriter writer(arena);
 cn.accept(&writer);
 auto result = writer.toByteArray();
 ```

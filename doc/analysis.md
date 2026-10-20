@@ -133,8 +133,9 @@ class MyInterpreter : public Interpreter<MyValue> {
 ## minidemo
 
 ```cpp
-tree::ClassNode cn;
-ClassReader reader(data, len);
+ca::str::Utf8StringArena arena;
+tree::ClassNode          cn;
+ClassReader              reader(arena, data, len);
 reader.accept(&cn, 0);
 
 for (auto* method : cn.methods) {

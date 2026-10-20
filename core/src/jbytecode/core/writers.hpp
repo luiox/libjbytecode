@@ -479,6 +479,10 @@ public:
                                         const std::vector<ca::str::Utf8StringRef>& exceptions) override;
     void                    visitEnd() override {}
 
+    /// @brief 序列化已访问的 class 结构。
+    /// @throws ClassTooLargeException 常量池条目超过 65535。
+    /// @throws MethodTooLargeException 单个方法 Code 超过 65535 字节。
+    /// @throws FrameComputationException COMPUTE_FRAMES 的 fixpoint 不收敛或超出预算。
     std::vector<ca::u8>    toByteArray();
     ca::str::Utf8StringRef getClassName() const { return className_; }
     ca::i32                version() const { return version_; }

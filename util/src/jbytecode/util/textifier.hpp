@@ -101,7 +101,7 @@ private:
     static constexpr const char* TAB3 = "      ";
     static constexpr const char* LTAB = "   ";
 
-    // -- arena 死亡点声明（memory-governance-plan §5-P1③）--
+    // -- arena 死亡点声明 --
     // 本成员持有 Textifier 私有的 Utf8StringArena：getLabelName() 生成的 "L<N>" 标签名
     // intern 自本 arena，仅缓存在成员 labelNames_ 中；各 visit* 把名字拼进行文本后经
     // line(textArena.intern(...)) 转写进 textArena（Printer 基类成员，见 printer.hpp 的

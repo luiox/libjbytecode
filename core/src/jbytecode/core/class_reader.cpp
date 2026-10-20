@@ -284,14 +284,12 @@ Utf8StringRef ClassReader::readUtf(i32 idx, std::vector<char>&)
     constantUtf8Values_[idx] = ref;
     return ref;
 }
-Utf8StringRef ClassReader::readUtf(i32 offset, i32 utfLength, std::vector<char>& charBuffer)
+Utf8StringRef ClassReader::readUtf(i32 offset, i32 utfLength, std::vector<char>&)
 {
-    // Read a raw MUTF-8 string from classFileBuffer at given offset with given byte length.
-    // This is used by SourceDebugExtension and similar attributes.
+    // 读取 SourceDebugExtension 等属性中的裸 MUTF-8；转换结果直接 intern 进 arena，
+    // 不再经过调用方的 charBuffer（该参数仅为兼容既有签名保留）。
     if (utfLength <= 0) return {};
     checkRange(offset, utfLength);
-    // Use charBuffer to store the converted UTF-8 data
-    charBuffer.resize(utfLength * 2 + 1);   // generous estimate for MUTF-8 → UTF-8 expansion
     auto r = jstr::mutf8_to_utf8(
         jstr::MUtf8StringRef((const char*)(classFileBuffer_ + offset), utfLength));
     if (r.is_err()) return {};
@@ -300,12 +298,12 @@ Utf8StringRef ClassReader::readUtf(i32 offset, i32 utfLength, std::vector<char>&
 }
 Utf8StringRef ClassReader::getClassName()
 {
-    std::vector<char> b(maxStringLength_);
+    std::vector<char> b;
     return readClass(header_ + 2, b);
 }
 Utf8StringRef ClassReader::getSuperName()
 {
-    std::vector<char> b(maxStringLength_);
+    std::vector<char> b;
     return readClass(header_ + 4, b);
 }
 std::vector<Utf8StringRef> ClassReader::getInterfaces()
@@ -316,7 +314,7 @@ std::vector<Utf8StringRef> ClassReader::getInterfaces()
     std::vector<Utf8StringRef> interfaces(interfacesCount);
 
     if (interfacesCount > 0) {
-        std::vector<char> charBuffer(maxStringLength_);
+        std::vector<char> charBuffer;
         for (int i = 0; i < interfacesCount; ++i) {
             currentOffset += 2;
             interfaces[i] = readClass(currentOffset, charBuffer);

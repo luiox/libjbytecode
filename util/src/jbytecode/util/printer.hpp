@@ -21,7 +21,7 @@ public:
 
     static std::string getAccessFlagsStr(int access, bool capital = true);
 
-    // -- arena 死亡点声明（memory-governance-plan §5-P1③）--
+    // -- arena 死亡点声明 --
     // 本成员持有 Printer 私有的 Utf8StringArena：全部输出行（addLine/line 及各 visit*
     // 的 textArena.intern(...)）的视图 intern 自本 arena，存入公开成员 text 并经
     // getText() 出境。

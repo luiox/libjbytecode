@@ -222,7 +222,8 @@ ByteVector& ByteVector::putUTF8(const str::Utf8StringRef& str)
             return putMUtf8(reinterpret_cast<const u8*>(wtf8.unwrap().data()),
                             static_cast<i32>(wtf8.unwrap().size()));
         }
-        // 非 UTF-8 字节（如字节流载体）：按 Latin-1 每 code point 转 MUTF-8，永不失败。
+        // 非 UTF-8 字节（如字节流载体）：按 Latin-1 每 code point 转 MUTF-8。
+        // 唯一失败条件是空指针配非零长度；Utf8StringRef 正常构造不会出现，保留防御分支。
         auto latin1 = jstr::latin1_to_mutf8(str.data(), str.byte_length());
         if (latin1.is_err()) {
             throw std::runtime_error("Failed to convert to MUTF-8 (both utf8 and latin1 paths)");

@@ -79,7 +79,7 @@ private:
     std::string name_;
     int         id_ = 0;
 
-    // -- arena 死亡点声明（memory-governance-plan §5-P1③）--
+    // -- arena 死亡点声明 --
     // 本成员持有 CodeGen 私有的 Utf8StringArena：getLabelName() 生成的 "label<N>" 名字
     // intern 自本 arena，仅缓存在成员 labelNames_ 中；各 visit*Insn/visitLabel 把名字
     // 拼进行文本后重新 intern 进 textArena（Printer 基类成员，见 printer.hpp 的声明），

@@ -99,8 +99,9 @@ flowchart LR
 `ClassWriter(COMPUTE_FRAMES)` 启用自动栈帧计算，在 `toByteArray()` 时对每个方法做
 数据流分析，生成优化编码的 StackMapTable 属性。`COMPUTE_FRAMES` 隐式包含 `COMPUTE_MAXS`。
 
-实现是 ASM Frame.java 的直接移植（`Frame` / `CurrentFrame` 类 + `computeAllFrames()`
-fixpoint），不是简化版。能正确处理 javac 生成的全部合法字节码。
+实现结构与 ASM Frame.java 对齐（`Frame` / `CurrentFrame` 类 + `computeAllFrames()`
+fixpoint），不是简化版。能正确处理 javac 生成的全部合法字节码。worklist 带迭代预算，
+不收敛时抛 `FrameComputationException`，避免继承环或病态 provider 导致进程卡死。
 
 ### 算法：两步法 + worklist fixpoint
 
@@ -169,11 +170,12 @@ class MyProvider : public core::ICommonSuperClassProvider {
     ca::str::Utf8StringRef getCommonSuperClass(
         const ca::str::Utf8StringRef& t1,
         const ca::str::Utf8StringRef& t2) override {
-        return "java/lang/Number";  // 用 Class.forName 或预计算表
+        return ca::str::Utf8StringRef::from_cstr("java/lang/Number");  // 用 Class.forName 或预计算表
     }
 };
-MyProvider provider;
-ClassWriter cw(ClassWriter::COMPUTE_FRAMES);
+MyProvider                provider;
+ca::str::Utf8StringArena arena;
+ClassWriter               cw(arena, ClassWriter::COMPUTE_FRAMES);
 cw.setTypeResolver(&provider);
 ```
 
@@ -213,9 +215,9 @@ Tree 回放的事件顺序、迭代器失效和线程安全约束统一记录在
 ### ClassReader
 
 ```cpp
-ClassReader(const ca::u8* buf, ca::i32 len);            // 从内存
-explicit ClassReader(const std::string& classFilePath); // 从文件
-explicit ClassReader(std::istream& is);                 // 从流
+ClassReader(ca::str::Utf8StringArena& arena, const ca::u8* buf, ca::i32 len); // 借用 buf，不复制
+ClassReader(ca::str::Utf8StringArena& arena, const std::string& path);         // 从文件
+ClassReader(ca::str::Utf8StringArena& arena, std::istream& is);                // 从流
 
 ca::i32                getAccess() const;
 ca::str::Utf8StringRef getClassName();
@@ -231,8 +233,8 @@ void accept(ClassVisitor* cv, Attribute* prototypes, ca::i32 parsingOptions);
 ### ClassWriter
 
 ```cpp
-ClassWriter();                              // 直接写出，maxs/frames 由调用方提供
-ClassWriter(int flags);                     // flags = COMPUTE_MAXS | COMPUTE_FRAMES
+ClassWriter(ca::str::Utf8StringArena& arena);                    // maxs/frames 由调用方提供
+ClassWriter(ca::str::Utf8StringArena& arena, int flags);         // flags = COMPUTE_MAXS | COMPUTE_FRAMES
 
 void setTypeResolver(ICommonSuperClassProvider* r);  // 注入公共父类解析器
 std::vector<ca::u8> toByteArray();                    // 序列化（触发 phase-1/phase-2）
@@ -266,8 +268,9 @@ visitEnd()
 
 ```cpp
 // 读取 → 修改 → 写出
-ClassReader reader(data, len);
-ClassWriter writer(ClassWriter::COMPUTE_MAXS);
+ca::str::Utf8StringArena arena;
+ClassReader              reader(arena, data, len);
+ClassWriter              writer(arena, ClassWriter::COMPUTE_MAXS);
 reader.accept(&writer, 0);    // 直通回放（无修改）
 std::vector<ca::u8> result = writer.toByteArray();
 

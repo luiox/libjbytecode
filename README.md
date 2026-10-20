@@ -1,6 +1,8 @@
 # libjbytecode
 
-OW2 ASM 的 C++17 移植：Java `.class` 字节码的解析、生成、分析与变换库（xmake）。
+ASM 兼容的独立 C++17 实现：Java `.class` 字节码的解析、生成、分析与变换库（xmake）。
+
+visitor 事件、字节码语义和主要类型命名与 ASM 保持一致，但不是逐行移植。JVM 的 GC 与 finalize 生命周期无法搬进 C++：早期照搬 ASM 裸 `new` 结构的版本只能靠零散 delete 补丁维持，泄漏与重复释放反复出现。本实现改为 arena 持有方法域内的指令节点与 `Label`，根对象交给拥有型容器，跨边界视图一律借用，所有权规则见 [doc/safety.md](doc/safety.md)，与 ASM 的模型差异见 [doc/design.md](doc/design.md)。
 
 - **语言**：C++17，规避 RTTI（向下转型用 libca 的 `ca::core::tag_cast::cast<T>`，不用 `dynamic_cast`）
 - **命名空间**：`jbytecode`（子模块 `jbytecode::core` / `::tree` / `::commons` / `::analysis` / `::util`）
@@ -28,7 +30,7 @@ libjbytecode (聚合静态库)
 └── util/      调试/追踪/验证工具（Printer、Textifier、ASMifier、CheckAdapter、TraceClassVisitor）
 ```
 
-依赖链：`core`（依赖 libca / libjstr / libgarena 包）→ `tree` / `commons` / `analysis` / `util`（依赖 core）。
+依赖链：`core`（依赖 libca / libjstr / libgarena 包）→ `tree` / `commons` / `analysis` / `util`（依赖 core，analysis 另依赖 tree）。
 聚合库 `libjbytecode` 串联全部子库并对外暴露统一头文件。
 
 ## 快速开始
@@ -76,10 +78,14 @@ for (auto* m : cn.methods) {
         // 遍历指令，如 insn->getOpcode()
     }
 }
-auto* method = cn.methods[0];
-method->instructions.insert(method->instructions.getFirst(),
-                            new tree::InsnNode(Opcodes::ACONST_NULL));
-cn.accept(&writer);
+auto*           method = cn.methods[0];
+tree::InsnList& insns  = method->instructions;
+// 指令节点在方法 arena 上分配，寿命随 MethodNode；不要手工 new 后挂入
+insns.insert(insns.getFirst(), insns.create<tree::InsnNode>(Opcodes::ACONST_NULL));
+
+ClassWriter treeWriter(arena);
+cn.accept(&treeWriter);
+std::vector<ca::u8> modified = treeWriter.toByteArray();
 ```
 
 ## 构建与测试
@@ -90,7 +96,13 @@ cn.accept(&writer);
 xmake repo --add luiox-repo https://github.com/luiox/luiox-repo.git
 xmake f --with_tests=y -y     # 配置（gtest 仅测试需要；demo 另加 --with_demo=y）
 xmake build libjbytecode      # 聚合库
+# 测试 target 默认关闭，按需逐个构建（xmake build 一次只接受一个 target）
 xmake build libjbytecode_asm_core_unittest
+xmake build libjbytecode_tree_unittest
+xmake build libjbytecode_analysis_unittest
+xmake build libjbytecode_commons_unittest
+xmake build libjbytecode_util_unittest
+xmake build libjbytecode_core_unittest
 xmake run libjbytecode_asm_core_unittest
 ```
 
@@ -101,7 +113,7 @@ xmake run libjbytecode_asm_core_unittest
 | `libjbytecode_core` / `_tree` / `_commons` / `_analysis` / `_util` | 静态库 | 各子模块独立子库 |
 | `libjbytecode` | 静态库 | 聚合库（统一头 + 串联子库） |
 | `libjbytecode_asm_core_unittest` / `_tree_unittest` / `_commons_unittest` / `_analysis_unittest` / `_util_unittest` | 测试 | 子模块单元测试（默认关闭，`--with_tests=y`） |
-| `libjbytecode_origin_unittest` | 测试 | core 单元测试（同 asm_core 源，独立 target） |
+| `libjbytecode_core_unittest` | 测试 | ASM 扩展与集成测试（依赖全部子库，默认关闭） |
 | `demo_*` | 可执行 | 各类用法示例（默认关闭，`--with_demo=y`） |
 
 测试纪律（资源来源、round-trip 契约边界、`skip` 使用限制）见
@@ -119,8 +131,8 @@ xmake run libjbytecode_asm_core_unittest
 
 ## 状态与 License
 
-- **开发中，未定版**：尚无发布 tag，API 可能调整；包版本以 `xmake.lua` 的 `add_requires` 版本锁为准。
-- 依赖包 libjstr / libgarena 转公开之前，匿名环境（如托管 CI runner）拉包构建会失败，属预期。
+- **开发中，未定版**：仓库不打 tag，API 可能调整；包版本以 [luiox-repo](https://github.com/luiox/luiox-repo) 的 `packages/l/libjbytecode/xmake.lua` 版本锁为准，本仓库 `xmake.lua` 固定其依赖版本。
+- 依赖包 libjstr / libgarena / libjzip 均为公开仓库。
 - 基于 [MIT License](LICENSE) 发布。
 
 ## 深入阅读

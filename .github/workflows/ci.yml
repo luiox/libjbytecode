@@ -1,10 +1,8 @@
 # libjbytecode CI（Linux + Windows）
 #
-# 范围：libjbytecode 聚合库 + 五子库 + 全部 unittest（core/origin/tree/analysis/commons/util/asm-test）。
+# 范围：libjbytecode 聚合库 + 五子库 + 全部 unittest（core/tree/analysis/commons/util/asm-test）。
 #
-# 已知失败模式：依赖包 libjstr / libgarena 转公开之前，托管 runner 在包沙箱内
-# 匿名克隆这两个私有仓会失败（Configure 步骤红），属预期；翻公开即自愈。
-# 托管 runner 首跑无包缓存，libca/gtest 源码重编耗时数分钟亦属预期。
+# 托管 runner 首跑无包缓存，libca/libjstr/libgarena/gtest 源码重编耗时数分钟属预期。
 # 依赖：libca 经 luiox-repo git 直连包拉取（xmake.lua 不声明 add_repositories，
 # 由 CI/消费方显式注册，见 xmake.lua 头注释）；gtest 走 xrepo。
 
@@ -60,7 +58,6 @@ jobs:
         run: |
           xmake build libjbytecode
           xmake build libjbytecode_asm_core_unittest
-          xmake build libjbytecode_origin_unittest
           xmake build libjbytecode_tree_unittest
           xmake build libjbytecode_analysis_unittest
           xmake build libjbytecode_commons_unittest
@@ -70,7 +67,6 @@ jobs:
       - name: Run unit tests
         run: |
           xmake run libjbytecode_asm_core_unittest
-          xmake run libjbytecode_origin_unittest
           xmake run libjbytecode_tree_unittest
           xmake run libjbytecode_analysis_unittest
           xmake run libjbytecode_commons_unittest
@@ -112,7 +108,6 @@ jobs:
         run: |
           xmake build libjbytecode
           xmake build libjbytecode_asm_core_unittest
-          xmake build libjbytecode_origin_unittest
           xmake build libjbytecode_tree_unittest
           xmake build libjbytecode_analysis_unittest
           xmake build libjbytecode_commons_unittest
@@ -123,7 +118,6 @@ jobs:
         shell: bash
         run: |
           xmake run libjbytecode_asm_core_unittest
-          xmake run libjbytecode_origin_unittest
           xmake run libjbytecode_tree_unittest
           xmake run libjbytecode_analysis_unittest
           xmake run libjbytecode_commons_unittest

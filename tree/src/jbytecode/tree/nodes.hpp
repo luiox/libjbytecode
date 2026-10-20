@@ -367,7 +367,7 @@ public:
 class MethodNode : public jbytecode::core::MethodVisitor
 {
 public:
-    /// 内容物 arena（指令节点/Label(B8 起)/TryCatch/局部变量/参数/注解子树）：
+    /// 内容物 arena（指令节点/Label/TryCatch/局部变量/参数/注解子树）：
     /// 声明居首 → 析构居末（内容先于壳死亡）。惰性分配，首块 4KB 随方法体规模倍增。
     /// 节点创建一律走 create<T>()：产物寿命 = 方法寿命，析构由 arena 逆序统一执行。
     garena::Arena nodeArena_{kNodeArenaFirstChunkBytes};
@@ -375,9 +375,9 @@ public:
     ca::str::Utf8StringRef              name, desc, signature;
     std::vector<ca::str::Utf8StringRef> exceptions;
     /// 指令链表绑定本方法 arena：add/insert 的节点必须由 nodeArena_ 分配（归属一致性
-    /// 目前靠调用纪律维持，DEV-11 裁决 debug 断言推迟，见 doc_ai/arena-migration-deviations.md）。
+    /// 目前靠调用纪律维持，debug 断言尚未覆盖所有挂入点）。
     InsnList instructions{&nodeArena_};
-    /// B8：外来 Label（owner_==nullptr）收编映射：外来指针 → 本方法 arena 副本。
+    /// 外来 Label（owner_==nullptr）收编映射：外来指针 → 本方法 arena 副本。
     /// 寿命前提：外来 Label 须存活至本方法装配结束（reader labelArena_ / 调用方堆对象）；
     /// 键为裸指针，外来 Label 提前释放且地址被新 Label 复用时，收编映射会误命中旧副本。
     std::unordered_map<jbytecode::core::Label*, jbytecode::core::Label*> foreignLabels_;
@@ -589,7 +589,7 @@ public:
     void accept(jbytecode::core::MethodVisitor* mv);
     void check(int api) const { (void)api; }
 
-    // ---- Label 归属（B8：arena 盖章即所有权，见 DESIGN.md §6.1）----
+    // ---- Label 归属（arena 盖章即所有权，见 doc/design.md §6.1）----
 
     /// 在本方法内容 arena 上新建 Label 并盖章 owner=this（B8 起的标准建点）。
     jbytecode::core::Label* createLabel();

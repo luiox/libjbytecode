@@ -35,24 +35,26 @@ flowchart LR
 ### TraceClassVisitor（打印字节码）
 
 ```cpp
-ClassReader reader(data, len);
-ClassWriter writer;
+ca::str::Utf8StringArena arena;
+ClassReader              reader(arena, data, len);
+ClassWriter              writer(arena);
 
 util::Textifier textifier;
 util::TraceClassVisitor tcv(&writer, &textifier);   // cv + printer
 reader.accept(&tcv, 0);
 
 // 文本在 textifier.text（按行）或 textifier.stringBuilder（累积）
-for (const auto& line : textifier.getText()) {
-    printf("%s\n", line.c_str());
+for (const auto& line : textifier.text) {
+    std::cout << line.to_std_string() << '\n';
 }
 ```
 
 ### ASMifier（生成等价代码）
 
 ```cpp
-ClassReader reader(data, len);
-util::ASMifier asmifier;
+ca::str::Utf8StringArena arena;
+ClassReader              reader(arena, data, len);
+util::ASMifier           asmifier;
 util::TraceClassVisitor tcv(/*cv=*/nullptr, &asmifier);
 reader.accept(&tcv, 0);
 
@@ -62,9 +64,10 @@ reader.accept(&tcv, 0);
 ### CheckClassAdapter（验证）
 
 ```cpp
-ClassReader reader(data, len);
-ClassWriter writer;
-util::CheckClassAdapter cca(&writer);   // 非法事件序列/参数抛 std::runtime_error
+ca::str::Utf8StringArena arena;
+ClassReader              reader(arena, data, len);
+ClassWriter              writer(arena);
+util::CheckClassAdapter  cca(&writer);   // 非法事件序列/参数抛 std::invalid_argument
 reader.accept(&cca, 0);
 ```
 
@@ -72,11 +75,12 @@ reader.accept(&cca, 0);
 
 ```cpp
 // 打印任意 .class 的可读清单
-ClassReader reader(data, len);
-util::Textifier textifier;
-util::TraceClassVisitor tcv(nullptr, &textifier);
+ca::str::Utf8StringArena arena;
+ClassReader              reader(arena, data, len);
+util::Textifier          textifier;
+util::TraceClassVisitor  tcv(nullptr, &textifier);
 reader.accept(&tcv, /*parsingOptions=*/0);
-for (const auto& line : textifier.getText()) {
-    printf("%s\n", line.c_str());
+for (const auto& line : textifier.text) {
+    std::cout << line.to_std_string() << '\n';
 }
 ```

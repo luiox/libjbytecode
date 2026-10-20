@@ -379,9 +379,9 @@ class InsnList
 public:
     InsnList() = default;
     /// @brief 绑定 owner arena：挂入本表的节点必须由该 arena 分配。
-    ///        归属一致性目前靠调用纪律维持（DEV-11 裁决：debug 断言推迟，见
-    ///        doc_ai/arena-migration-deviations.md）；跨域违规挂入将在 disposeNode
-    ///        处对 bump 内存误走 delete（堆损坏），新增建点请走 owner.create<T>()。
+    ///        归属一致性目前靠调用纪律维持（debug 断言尚未覆盖所有挂入点）；
+    ///        跨域违规挂入会在 disposeNode 处对 bump 内存误走 delete（堆损坏），
+    ///        新增建点请走 owner.create<T>()。
     explicit InsnList(garena::Arena* ownerArena) noexcept
         : ownerArena_(ownerArena)
     {}
