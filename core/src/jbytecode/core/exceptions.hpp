@@ -1,8 +1,9 @@
 ﻿/// @file        exceptions.hpp
-/// @brief       core 写出侧的容量/版本异常类型。对标 ASM 的同名异常。
+/// @brief       core 写出侧的容量与帧计算异常类型。对标 ASM 的同名异常。
 ///
-/// 当 ClassWriter 序列化结果超出 class 文件格式硬限制时抛出。异常类极薄（仅携带
-/// 诊断字段），按 C++ 惯例保留 header-only 内联构造，不下沉到 .cpp。
+/// 当 ClassWriter 序列化结果超出 class 文件格式硬限制，或 COMPUTE_FRAMES 不收敛时
+/// 抛出。异常类极薄（仅携带诊断字段），按 C++ 惯例保留 header-only 内联构造，
+/// 不下沉到 .cpp。解析侧的畸形输入统一抛 std::invalid_argument，不在此文件定义。
 #pragma once
 
 #include <string>
@@ -63,16 +64,6 @@ private:
     std::string methodName_;
     std::string descriptor_;
     int         codeSize_;
-};
-
-/// @brief 读取到不受支持的 class 文件版本时抛出。对标 ASM 同名异常。
-class UnsupportedClassVersionException : public std::runtime_error
-{
-public:
-    /// @param message 诊断信息。
-    explicit UnsupportedClassVersionException(const std::string& message)
-        : std::runtime_error(message)
-    {}
 };
 
 /// @brief COMPUTE_FRAMES 栈帧 fixpoint 不收敛（或迭代超限）时抛出。

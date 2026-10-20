@@ -6,10 +6,11 @@
 /// @copyright   Copyright (c) 2026
 ///
 /// 包含 libjbytecode 全部公共 API：
-///   - core/      底层 Core API（ClassReader/Writer、Opcodes、Type、Handle 等）
+///   - core/      底层 Core API（ClassReader/Writer、Opcodes、Type、Handle、净化器、异常）
 ///   - tree/      Tree API（ClassNode、MethodNode、InsnList 等）
-///   - commons/   工具适配器（Remapper、Adapter 体系）
+///   - commons/   工具适配器（Remapper、Adapter 体系、模块属性）
 ///   - analysis/  字节码分析（Frame、Analyzer、Interpreter）
+///   - util/      调试与验证工具（Printer、Textifier、ASMifier）
 ///
 /// 可按需单独包含子模块头文件以减少编译时间。
 #pragma once
@@ -19,7 +20,14 @@
 #include "jbytecode/core/constants.hpp"
 #include "jbytecode/core/type.hpp"
 #include "jbytecode/core/primitives.hpp"
+#include "jbytecode/core/byte_array.hpp"
 #include "jbytecode/core/byte_vector.hpp"
+#include "jbytecode/core/exceptions.hpp"
+#include "jbytecode/core/frame.hpp"
+#include "jbytecode/core/symbol_table.hpp"
+#include "jbytecode/core/type_reference.hpp"
+#include "jbytecode/core/bounded_common_super_class_provider.hpp"
+#include "jbytecode/core/class_file_sanitizer.hpp"
 #include "jbytecode/core/readers.hpp"
 #include "jbytecode/core/writers.hpp"
 #include "jbytecode/core/visitors.hpp"
@@ -44,8 +52,10 @@
 #include "jbytecode/commons/jsr_inliner_adapter.hpp"
 #include "jbytecode/commons/signature_remapper.hpp"
 #include "jbytecode/commons/method.hpp"
+#include "jbytecode/commons/module_attributes.hpp"
 
 // analysis
+#include "jbytecode/analysis/exceptions.hpp"
 #include "jbytecode/analysis/basic_interpreter.hpp"
 #include "jbytecode/analysis/basic_verifier.hpp"
 #include "jbytecode/analysis/simple_verifier.hpp"
@@ -56,6 +66,8 @@
 // util 包 — 调试/追踪/验证工具
 #include "jbytecode/util/printer.hpp"
 #include "jbytecode/util/textifier.hpp"
+#include "jbytecode/util/asmifier.hpp"
+#include "jbytecode/util/util.hpp"
 #include "jbytecode/util/codegen.hpp"
 #include "jbytecode/util/asmifier_support.hpp"
 #include "jbytecode/util/textifier_support.hpp"

@@ -57,7 +57,7 @@ private:
     bool                               isInterface_;
 
     mutable std::list<jbytecode::core::Type> typeCache_;
-    // -- arena 死亡点声明（memory-governance-plan §5-P1③）--
+    // -- arena 死亡点声明 --
     // 本成员持有 SimpleVerifier 私有的 Utf8StringArena：仅承载验证期合成出的数组描述符
     // （newValue / newArrayValue 里给元素类型拼 "[" 前缀后经 Type::fromArena intern）。
     // 这些 Type 副本存入 typeCache_ 并随 BasicValue 经 newValue / merge / getElementValue

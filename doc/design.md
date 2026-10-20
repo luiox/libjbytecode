@@ -9,9 +9,10 @@
 
 ## 1. 这个库是什么
 
-libjbytecode 是 **OW2 ASM（`org.objectweb.asm`）的 C++17 移植**，提供 Java `.class`
-字节码的**解析、生成、分析、变换**四类能力。设计目标是「行为对齐 ASM」：熟悉 ASM 的人
-能凭直觉使用，移植代码时能逐类对照（每个头文件注释标注其对应的 ASM Java 源文件）。
+libjbytecode 是 **ASM（`org.objectweb.asm`）兼容的独立 C++17 实现**，提供 Java `.class`
+字节码的**解析、生成、分析、变换**四类能力。设计目标是「行为对齐 ASM」：visitor 事件、
+字节码语义和主要类型命名与 ASM 保持一致，熟悉 ASM 的人能凭直觉使用（每个头文件注释
+标注其对应的 ASM Java 源文件），但实现与内存模型独立演进，不是逐行移植。
 
 几条贯穿全库的基调，先记住它们，后面所有设计都从这里推导：
 
@@ -21,10 +22,15 @@ libjbytecode 是 **OW2 ASM（`org.objectweb.asm`）的 C++17 移植**，提供 J
   这影响到指令节点、Value、Attribute 等所有多态层级的类型判别方式。
 - **Visitor（访问者）是一切的中枢。** 读、写、变换、打印、校验，全部表达为同一套
   visitor 事件流的生产者/消费者。理解了 visitor 链，就理解了全库的数据流。
-- **裸指针 + 调用方负责生命周期。** 树节点、Label、Attribute 等大量用 `new` 裸指针互联，
-  库**不做**自动回收。这是对齐 ASM（Java 有 GC）的代价，使用约束集中在 `safety.md`。
+- **arena + 拥有型容器代替 GC。** Java 的 GC 与 finalize 生命周期无法搬进 C++：早期按
+  ASM 结构直接 `new` 的写法靠零散 delete 补丁维持，漏删和重复删反复出现。现行模型把
+  方法域内的指令节点与 `Label` 放在 owner arena 上分配、随方法域整体析构；`ClassNode` /
+  `MethodNode` 等根对象由拥有型容器或调用方 RAII 管理；跨边界的字符串和标签视图一律
+  借用，生命期由 arena 保证。这是本实现与 ASM 最重要的差异，约束集中在 `safety.md`。
 - **线程不安全。** 没有任何同步原语，单线程使用或外部加锁。
-- **错误用异常。** 解析畸形输入抛 `std::runtime_error` 及子类；写出侧基本不抛。
+- **错误用异常。** 解析畸形输入抛 `std::invalid_argument`；写出时容量超限抛
+  `std::length_error` 子类（`ClassTooLargeException` / `MethodTooLargeException`），
+  栈帧计算不收敛抛 `FrameComputationException`。分配失败保持 `std::bad_alloc`。
 
 命名空间统一 `jbytecode`，子模块各占一个子命名空间。统一入口是聚合头
 `<jbytecode/jbytecode.hpp>`，也可按需单独包含子模块的头。
@@ -52,7 +58,7 @@ libjbytecode 是 **OW2 ASM（`org.objectweb.asm`）的 C++17 移植**，提供 J
               └────────┘
 ```
 
-- **core** 只依赖 libca（基础类型/字符串/SHA-1）与 libjstr。它是地基，不依赖其它子模块。
+- **core** 只依赖 libca（基础类型/字符串/SHA-1）、libjstr 与 libgarena。它是地基，不依赖其它子模块。
 - **tree / commons / util / analysis** 都建立在 core 之上，并复用 libca 的 `ca::core::tag_cast`。
 - **analysis** 还依赖 tree（分析的输入是 tree 的 `MethodNode`）。
 - **util** 的字节码校验部分也会用到 analysis。
@@ -141,8 +147,8 @@ class 的嵌套结构：类→方法→注解、类→字段→注解、类→re
 双向链表 `InsnList`，节点是 `AbstractInsnNode` 的各子类。**分析（analysis）也以树为输入**，
 因为它要在指令链上构建控制流图。
 
-> 树节点和 Label 都是裸指针、库不回收，迭代中增删有失效规则——这是 tree/analysis 使用时
-> 最容易踩的坑，**动手改 `InsnList` 前先读 `safety.md`**。
+> 树节点和 Label 由 owner arena 回收，跨方法域的指针共享受归属约束，迭代中增删有失效
+> 规则——这是 tree/analysis 使用时最容易踩的坑，**动手改 `InsnList` 前先读 `safety.md`**。
 
 ---
 
@@ -178,15 +184,15 @@ class 的嵌套结构：类→方法→注解、类→字段→注解、类→re
 
 ## 6. 内存与所有权模型（务必先建立的心智）
 
-ASM 跑在有 GC 的 JVM 上，这个移植没有 GC，所以所有权规则必须显式记住：
+ASM 跑在有 GC 的 JVM 上，本实现没有 GC，所以所有权规则必须显式记住：
 
-- **树节点建点走 arena（B7 起）**：指令节点经 `MethodNode::create<T>()` / `InsnList::create<T>()`
+- **树节点建点走 arena**：指令节点经 `MethodNode::create<T>()` / `InsnList::create<T>()`
   在归属方法的内容 arena 上分配，寿命 = 方法寿命，析构由 arena 逆序统一执行。
   `ClassNode`/`MethodNode` 等**根对象**仍堆分配、由拥有型容器（或调用方 RAII）释放。
   混合清除纪律：绑定列表析构/`clear`/`set` 对 arena 节点只摘链（arena 统一回收）、
   对堆节点（暂存管线产物）维持容器 `delete`；`remove` 一律只摘链。
   详见 `safety.md` 的失效表。
-- **`Label` 走归属制（B8）**：`Label` 带 owner arena 盖章；方法域 label 经
+- **`Label` 走归属制**：`Label` 带 owner arena 盖章；方法域 label 经
   `MethodNode::createLabel()` 在 `nodeArena_` 建点、随 arena 回收。visitor 边界
   `canonicalizeLabel`：本域 label O(1) 直返，外来 label 拷贝收编（原对象归创建方）。
   旧「label 池 + taken 标志 + onNodeAdded 回调」制度已物理退役。详见 §6.1。
@@ -200,10 +206,9 @@ ASM 跑在有 GC 的 JVM 上，这个移植没有 GC，所以所有权规则必�
 这套模型的完整约束（迭代器失效、accept 事件顺序、线程/异常安全边界）集中在
 **`safety.md`——动手写变换前必读那一篇**。
 
-### 6.1 Label 所有权（B8 归属制：owner arena 盖章，禁止跨方法共享）
+### 6.1 Label 所有权（owner arena 盖章，禁止跨方法共享）
 
-> 本节为 B8 后现行制度（批次9 已物理退役旧「label 池 + taken + onNodeAdded」方案，
-> 迁移过程见 `doc_ai/arena-migration-ledger.md`）。
+> 本节为现行制度。旧的「label 池 + taken 标志 + onNodeAdded 回调」方案已移除。
 
 `Label` 在 core 层（`primitives.hpp`），带 `owner()` 归属锚（指向建点 arena）。
 `Label*` 在 JumpInsnNode/LabelNode/TryCatchBlock/Switch/LineNumber/LocalVariable 里
@@ -222,7 +227,7 @@ ASM 跑在有 GC 的 JVM 上，这个移植没有 GC，所以所有权规则必�
    直返、否则建副本登记）。`MethodNode::resolveCloneLabel` 为其方法域便利封装。
 4. **禁止跨方法长期共享 `Label*`**：跨方法传递必须经 canonicalize/clone 收编为目标
    方法域副本。reader 借用窗口有额外约束：MethodWriter 把 Label 当 CFG 节点改写，
-   reader 的 label 必须活到 `toByteArray()`（DEV-10，见 `readers.hpp` 借约注释）。
+   reader 的 label 必须活到 `toByteArray()`（见 `readers.hpp` 的借约注释）。
 5. **Label 可以是 arena 产物也可以是调用方 scratch 产物**——owner 盖章是判别依据，
    不再要求「必须裸 new」。栈 Label 仍禁止（生命周期不足）。
 
@@ -234,7 +239,7 @@ ASM 跑在有 GC 的 JVM 上，这个移植没有 GC，所以所有权规则必�
   聚合目标 `libjbytecode`。最小可用只需 core（+ libca / libjstr / libgarena 包）。
 - 测试默认关闭，`xmake f --with_tests=y` 打开；demo 默认关闭，`--with_demo=y` 打开。
 - 每个子模块有独立的 `*_unittest` 目标；core 另有一份与 ASM 参考输出做结构化对拍的回归测试。
-- 具体命令见 `readme.md`「构建目标」与「快速开始」。
+- 具体命令见 `README.md`「构建目标」与「快速开始」。
 
 ---
 

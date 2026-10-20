@@ -134,6 +134,7 @@ public:
     void putBootstrapMethods(ByteVector& output);
 
     /// @name 常量池注册（去重后返回 Symbol*，UTF8/NameAndType 直接返回索引）
+    /// MUTF-8 常量超过 65535 字节时抛 std::length_error（来自 ByteVector::putMUtf8）。
     /// @{
     Symbol* addConstantClass(const ca::str::Utf8StringRef& value);
     Symbol* addConstantFieldref(const ca::str::Utf8StringRef& owner,
@@ -260,7 +261,7 @@ private:
     int                    labelTableCapacity_   = 0;
     LabelEntry**           labelEntries_         = nullptr;
     int                    labelEntriesCapacity_ = 0;
-    // -- arena 死亡点声明（memory-governance-plan §5-P1③）--
+    // -- arena 死亡点声明 --
     // 本成员借用调用方（ClassWriter/上层）拥有的 Utf8StringArena（非本类私有，可多 Writer
     // 共享）：addConstantClass/addConstantUtf8/addType/addUninitializedType 等登记的类名、
     // 描述符、类型表项 intern 自该 arena；返回的 Symbol*、getType()、getClassName() 及
