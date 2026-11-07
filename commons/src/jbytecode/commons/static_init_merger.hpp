@@ -1,3 +1,6 @@
+/// @defgroup commons_static_init_merger 静态块合并（StaticInitMerger）
+///
+/// 把多个静态块（\<clinit\>）合并为一个。
 #pragma once
 
 #include <string>

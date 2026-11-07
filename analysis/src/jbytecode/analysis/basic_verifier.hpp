@@ -1,3 +1,6 @@
+/// @defgroup analysis_basic_verifier JVM 验证规则（BasicVerifier）
+///
+/// BasicInterpreter 之上校验操作数类型匹配。
 #pragma once
 
 #include <vector>

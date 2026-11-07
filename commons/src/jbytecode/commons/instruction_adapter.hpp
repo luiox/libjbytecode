@@ -1,3 +1,6 @@
+/// @defgroup commons_instruction_adapter 方法名式指令生成（InstructionAdapter）
+///
+/// 用 load/store/add 等方法名代替裸 opcode 的友好生成器。
 #pragma once
 
 #include "libca/core/any.hpp"

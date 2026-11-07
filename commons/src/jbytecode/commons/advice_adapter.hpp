@@ -1,3 +1,7 @@
+/// @defgroup commons_advice_adapter AOP 切面注入（AdviceAdapter）
+///
+/// onMethodEnter / onMethodExit（构造器在 super 调用后）注入代码；
+/// 继承 GeneratorAdapter。
 #pragma once
 
 #include "libca/core/any.hpp"

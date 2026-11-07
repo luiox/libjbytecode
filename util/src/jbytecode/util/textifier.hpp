@@ -1,3 +1,6 @@
+/// @defgroup util_textifier 可读清单生成（Textifier）
+///
+/// Printer 实现：生成人类可读的字节码清单（指令、属性、注解）。
 #pragma once
 
 #include <string>

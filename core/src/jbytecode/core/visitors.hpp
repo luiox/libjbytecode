@@ -22,6 +22,12 @@
 ///   ModuleVisitor      ← ModuleVisitor.java
 ///   RecordComponentVisitor ← RecordComponentVisitor.java
 ///   SignatureVisitor   ← signature/SignatureVisitor.java
+
+/// @defgroup core_visitors Visitor 接口族
+///
+/// ClassVisitor/MethodVisitor/FieldVisitor/AnnotationVisitor/ModuleVisitor/
+/// RecordComponentVisitor/SignatureVisitor 委托基类，全库数据流的中枢。
+/// 事件契约见 doc:core-visitor-contract。
 #pragma once
 
 #include <stdexcept>

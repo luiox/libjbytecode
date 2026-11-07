@@ -13,6 +13,10 @@
 ///   - util/      调试与验证工具（Printer、Textifier、ASMifier）
 ///
 /// 可按需单独包含子模块头文件以减少编译时间。
+
+/// @defgroup jbytecode_entry 统一入口（聚合头）
+///
+/// 聚合全部子模块公共 API 并提供 get_lib_version()；分层见 doc:design-layering。
 #pragma once
 
 // core

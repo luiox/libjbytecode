@@ -1,3 +1,7 @@
+/// @defgroup core_class_file_sanitizer classfile 输入净化面
+///
+/// 在 ClassReader 之前做 CP 引用语义校验：校验 + 拒绝（带 CP index 的诊断），
+/// 敌意输入的环引用/越界引用不进入解析管线。
 #pragma once
 
 /// @file        class_file_sanitizer.hpp

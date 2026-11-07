@@ -1,3 +1,6 @@
+/// @defgroup commons_local_variables_sorter 局部变量槽位重排（LocalVariablesSorter）
+///
+/// 插桩后重排局部变量槽位，避免与既有槽位冲突。
 #pragma once
 
 #include "libca/core/any.hpp"

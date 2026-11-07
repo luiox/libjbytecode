@@ -1,3 +1,6 @@
+/// @defgroup util_asmifier_support ASMifier 支撑
+///
+/// ASMifier 的内部辅助（文本拼装等）。
 #pragma once
 
 #include <string>

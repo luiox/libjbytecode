@@ -1,3 +1,6 @@
+/// @defgroup analysis_subroutine JSR/RET 子程序跟踪（Subroutine）
+///
+/// 分析过程中的子程序（JSR/RET）归属跟踪结构。
 #pragma once
 
 #include <vector>

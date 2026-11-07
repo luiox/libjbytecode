@@ -1,3 +1,7 @@
+/// @defgroup analysis_basic_interpreter 栈帧形状解释器（BasicInterpreter）
+///
+/// BasicValue 只分类型类别（INT/FLOAT/REF/…），用于栈帧形状分析与
+/// maxStack/maxLocals 验证。
 #pragma once
 
 #include <vector>

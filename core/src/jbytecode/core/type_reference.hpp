@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/// @defgroup core_type_reference 类型注解目标定位（TypeReference）
+///
+/// 类型注解在类/字段/方法声明或签名中的位置引用（与 TypePath 配合）。
+#pragma once
 
 #include "jbytecode/core/byte_vector.hpp"
 

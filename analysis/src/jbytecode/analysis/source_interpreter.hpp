@@ -1,3 +1,6 @@
+/// @defgroup analysis_source_interpreter 来源追踪（SourceInterpreter）
+///
+/// SourceValue 记录产生该值的指令集合：def-use/死代码检测的基础。
 #pragma once
 
 #include <algorithm>

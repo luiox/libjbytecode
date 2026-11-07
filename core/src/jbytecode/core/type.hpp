@@ -1,4 +1,8 @@
 ﻿// type.hpp
+/// @defgroup core_type 类型描述符解析（Type）
+///
+/// 字段/方法描述符的解析与构造（getType/getMethodDescriptor/
+/// getArgumentsAndReturnSizes）。
 #pragma once
 
 #include <string>

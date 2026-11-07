@@ -1,3 +1,6 @@
+/// @defgroup util_trace_signature_visitor 签名打印（TraceSignatureVisitor）
+///
+/// 解析并打印泛型签名。
 #pragma once
 
 #include <string>

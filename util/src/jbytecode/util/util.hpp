@@ -1,3 +1,6 @@
+/// @defgroup util_util util 门面（Util）
+///
+/// util 模块的聚合辅助类。
 #pragma once
 #include <vector>
 #include <string>

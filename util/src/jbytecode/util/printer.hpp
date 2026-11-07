@@ -1,3 +1,7 @@
+/// @defgroup util_printer Printer 抽象基类
+///
+/// 与 Visitor 镜像的事件接收器，文本落公开成员 text（按行）与
+/// stringBuilder（累积）。见 doc:util-printer。
 #pragma once
 
 #include <string>

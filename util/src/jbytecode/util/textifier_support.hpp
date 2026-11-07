@@ -1,3 +1,6 @@
+/// @defgroup util_textifier_support Textifier 支撑
+///
+/// Textifier 的内部辅助（文本拼装等）。
 #pragma once
 
 #include <string>

@@ -1,3 +1,7 @@
+/// @defgroup commons_remapper_visitors 各层级的映射转发器
+///
+/// ClassRemapper/MethodRemapper/FieldRemapper/AnnotationRemapper/ModuleRemapper/
+/// RecordComponentRemapper：逐事件经 Remapper 改写后转发。
 #pragma once
 
 #include <memory>

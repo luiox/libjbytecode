@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/// @defgroup core_constants classfile 常量表（Constants）
+///
+/// JVM classfile attribute 名称与原始字节码常量值。
+#pragma once
 
 #include "libca/core/datatype.hpp"
 #include "jbytecode/core/opcodes.hpp"

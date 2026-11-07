@@ -160,7 +160,7 @@ void MethodNode::accept(MethodVisitor* mv)
     replayMethodBody(mv, this);
 }
 
-// ---- Label 归属（arena 盖章即所有权，见 doc/design.md §6.1）----
+// ---- Label 归属（arena 盖章即所有权，见 doc:design-label-ownership）----
 
 jbytecode::core::Label* MethodNode::createLabel()
 {

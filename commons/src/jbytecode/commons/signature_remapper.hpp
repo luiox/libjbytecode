@@ -1,3 +1,6 @@
+/// @defgroup commons_signature_remapper 签名重映射（SignatureRemapper）
+///
+/// SignatureVisitor 实现：签名内的类类型经 Remapper 改写。
 #pragma once
 
 #include <vector>

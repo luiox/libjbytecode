@@ -1,3 +1,7 @@
+/// @defgroup analysis_analyzer 数据流分析驱动器（Analyzer）
+///
+/// worklist fixpoint 驱动 Frame × Interpreter，产出每条指令处的栈帧
+/// （不可达指令为空）。见 doc:analysis-flow。
 #pragma once
 
 #include <vector>

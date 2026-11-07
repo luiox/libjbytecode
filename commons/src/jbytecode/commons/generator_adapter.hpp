@@ -1,3 +1,7 @@
+/// @defgroup commons_generator_adapter 高层代码生成（GeneratorAdapter）
+///
+/// push/ifCmp/newInstance/getTableSwitch 等高层方法生成方法体，内置
+/// LocalVariablesSorter。见 doc:commons-adapters。
 #pragma once
 
 #include "libca/core/any.hpp"

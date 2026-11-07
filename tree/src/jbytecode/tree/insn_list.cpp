@@ -501,7 +501,7 @@ void InsnList::insertBefore(AbstractInsnNode* where, AbstractInsnNode* node)
 void InsnList::set(AbstractInsnNode* oldNode, AbstractInsnNode* newNode)
 {
 #ifndef NDEBUG
-    checkNoActiveIterator();   // set 会 delete 旧节点：迭代中调用当前节点即 UAF（safety.md）
+    checkNoActiveIterator();   // set 会 delete 旧节点：迭代中调用当前节点即 UAF（doc:safety-iterator）
 #endif
     newNode->previousInsn = oldNode->previousInsn;
     newNode->nextInsn     = oldNode->nextInsn;
@@ -545,7 +545,7 @@ void InsnList::remove(AbstractInsnNode* node)
 void InsnList::removeAndDelete(AbstractInsnNode* node)
 {
 #ifndef NDEBUG
-    checkNoActiveIterator();   // 删除型操作：与 set 同规（safety.md 迭代器失效表）
+    checkNoActiveIterator();   // 删除型操作：与 set 同规（doc:safety-iterator 失效表）
 #endif
     removeFromList(node);
     disposeNode(node);
@@ -554,7 +554,7 @@ void InsnList::removeAndDelete(AbstractInsnNode* node)
 void InsnList::clear()
 {
 #ifndef NDEBUG
-    checkNoActiveIterator();   // clear 析构堆节点：迭代中调用必 UAF（safety.md）
+    checkNoActiveIterator();   // clear 析构堆节点：迭代中调用必 UAF（doc:safety-iterator）
 #endif
     auto* n = first_;
     while (n) {

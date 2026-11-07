@@ -1,4 +1,8 @@
-﻿#pragma once
+﻿/// @defgroup commons_remapper 重映射抽象（Remapper/SimpleRemapper）
+///
+/// map 家族把类名/描述符/签名映射到新值；SimpleRemapper 基于映射表实现。
+/// arena 注入是唯一构造路径。见 doc:commons-remapper。
+#pragma once
 
 #include <string>
 #include <vector>

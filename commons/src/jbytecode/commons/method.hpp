@@ -1,3 +1,7 @@
+/// @defgroup commons_method 方法引用模型（Method）
+///
+/// 以 owner/name/descriptor 表达方法引用，供 GeneratorAdapter/invokeStatic 等
+/// API 使用。
 #pragma once
 
 #include <string>

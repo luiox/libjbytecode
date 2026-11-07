@@ -24,6 +24,6 @@ This library parses untrusted binary input (`.class` files, archives). Reports
 about malformed-input handling — out-of-bounds access, unbounded memory growth,
 or unbounded loops triggered by hostile input — are in scope.
 
-Reports limited to the documented analysis boundaries (see `doc/safety.md`)
+Reports limited to the documented analysis boundaries (see `doc/safety.rst`)
 are not vulnerabilities; those boundaries are stated precisely and are
 intentional design decisions.

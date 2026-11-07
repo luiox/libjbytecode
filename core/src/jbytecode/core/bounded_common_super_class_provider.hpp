@@ -1,3 +1,8 @@
+/// @defgroup core_bounded_super_provider 公共父类解析器装饰器（调用预算）
+///
+/// 给任意 ICommonSuperClassProvider 包上 getCommonSuperClass 调用预算：provider
+/// 死循环（继承环等缺陷）超预算后抛 CommonSuperClassBudgetExceeded，由 MethodWriter
+/// 转为 FrameComputationException 降级。见 doc:core-frames-provider。
 #pragma once
 
 #include <stdexcept>

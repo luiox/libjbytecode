@@ -190,7 +190,7 @@ TEST(AnalyzerTest, instanceMethodThisLocal)
 //
 // 此前 analyzer 测试只断言结构性质（帧数、可达性、栈大小），移植自 ASM 的
 // 帧计算从未对「局部变量/操作数栈里到底是什么值」精确断言过（dev_plan 曾
-// 挂 analyzer-frame-model-suspect.md 待查项，文件并未落地）。以下用合法
+// 挂 analyzer-frame-model-suspect 待查项，文件并未落地）。以下用合法
 // 输入把 BasicInterpreter 的帧语义钉死：参数槽型、long/double 双槽语义、
 // 未用槽填充、同型合并不变、异型合并退化为 UNINITIALIZED、异常 handler
 // 帧清栈压引用。

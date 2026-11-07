@@ -1,4 +1,8 @@
-﻿#pragma once
+﻿/// @defgroup tree_insn_list 指令双向链表（InsnList 与指令节点）
+///
+/// InsnList 与 AbstractInsnNode 全部 16 个子类；arena/堆混合清除纪律与
+/// 迭代器失效规则见 doc:safety-iterator。
+#pragma once
 
 #include <cassert>
 #include "libca/core/datatype.hpp"
@@ -414,7 +418,7 @@ public:
 
     // -- 改/删 --
     /// @brief 用 newNode 原位替换 oldNode。arena 节点只摘链（arena reset 统一析构），
-    /// 堆节点维持立即析构。debug 下若有活跃迭代器则断言失败（见 safety.md 迭代器失效表）。
+    /// 堆节点维持立即析构。debug 下若有活跃迭代器则断言失败（见 doc:safety-iterator 失效表）。
     void set(AbstractInsnNode* oldNode, AbstractInsnNode* newNode);
     /// 摘链不删：arena 节点由 arena 统一回收；堆节点释放责任转移给调用方。
     void remove(AbstractInsnNode* node);
@@ -450,7 +454,7 @@ public:
     // -- 迭代器 --
 private:
     /// 活跃迭代器计数（begin/end 登记）：set/removeAndDelete/clear 的「迭代中改表」
-    /// debug 断言依据（safety.md 迭代器失效表）。读写仅 debug 生效，release 只占位。
+    /// debug 断言依据（doc:safety-iterator 失效表）。读写仅 debug 生效，release 只占位。
     /// #1065：本字段声明严禁被 NDEBUG 门控。InsnList 是跨 TU 共享布局的类型
     /// （内嵌 MethodNode、由 libjbytecode 本体方法就地改写、消费方经内联访问器
     /// 读写）：门控声明使 NDEBUG TU 与非 NDEBUG TU 的 size_ 等成员偏移漂移 8 字节
@@ -541,7 +545,7 @@ private:
     void checkNoActiveIterator() const
     {
         assert(activeIterators_ == 0 &&
-               "InsnList: mutating API called while iterators are alive (see libs/libjbytecode/doc/safety.md)");
+               "InsnList: mutating API called while iterators are alive (see doc/safety.rst)");
     }
 #endif
     /// 节点是否由 owner arena 分配（迁移期判别：arena 节点交给 arena 析构，
