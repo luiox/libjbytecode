@@ -1,3 +1,7 @@
+/// @defgroup util_check_adapters 事件序列校验器族（Check*Adapter）
+///
+/// Check*Adapter 运行时校验 visit 顺序与参数（非法即抛 std::invalid_argument）；
+/// CheckFrameAnalyzer 用 BasicVerifier 验证方法体。见 doc:util-classes。
 #pragma once
 
 #include <list>

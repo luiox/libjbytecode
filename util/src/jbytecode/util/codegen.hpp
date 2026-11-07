@@ -1,3 +1,6 @@
+/// @defgroup util_codegen 代码生成辅助（CodeGen）
+///
+/// 基于 Printer 的代码生成辅助实现。
 #pragma once
 
 #include <string>

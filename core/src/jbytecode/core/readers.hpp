@@ -1,4 +1,8 @@
-﻿#pragma once
+﻿/// @defgroup core_readers 类读取器（ClassReader）
+///
+/// 把 .class 二进制讲成 visitor 事件流的生产者：二遍扫描解析 Code 属性，
+/// 支持 SKIP_CODE/SKIP_DEBUG/SKIP_FRAMES/EXPAND_FRAMES。见 doc:core-two-pass。
+#pragma once
 
 /// @file        readers.hpp
 /// @brief       所有 Reader 类的声明聚合（对称于 writers.hpp / visitors.hpp）。

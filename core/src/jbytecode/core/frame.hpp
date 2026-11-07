@@ -15,6 +15,11 @@
 /// used independently of the full Frame class).
 ///
 /// @author Eric Bruneton
+
+/// @defgroup core_frame 栈帧计算内核（Frame）
+///
+/// 对齐 ASM Frame.java：单 int AbstractType 编码、输入/输出帧、execute/merge；
+/// ICommonSuperClassProvider 公共父类接口在此定义。见 doc:core-frames。
 #pragma once
 
 #include "libca/core/datatype.hpp"

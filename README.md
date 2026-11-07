@@ -2,7 +2,7 @@
 
 ASM 兼容的独立 C++17 实现：Java `.class` 字节码的解析、生成、分析与变换库（xmake）。
 
-visitor 事件、字节码语义和主要类型命名与 ASM 保持一致，但不是逐行移植。JVM 的 GC 与 finalize 生命周期无法搬进 C++：早期照搬 ASM 裸 `new` 结构的版本只能靠零散 delete 补丁维持，泄漏与重复释放反复出现。本实现改为 arena 持有方法域内的指令节点与 `Label`，根对象交给拥有型容器，跨边界视图一律借用，所有权规则见 [doc/safety.md](doc/safety.md)，与 ASM 的模型差异见 [doc/design.md](doc/design.md)。
+visitor 事件、字节码语义和主要类型命名与 ASM 保持一致，但不是逐行移植。JVM 的 GC 与 finalize 生命周期无法搬进 C++：早期照搬 ASM 裸 `new` 结构的版本只能靠零散 delete 补丁维持，泄漏与重复释放反复出现。本实现改为 arena 持有方法域内的指令节点与 `Label`，根对象交给拥有型容器，跨边界视图一律借用，所有权规则见 [doc/safety.rst](doc/safety.rst)，与 ASM 的模型差异见 [doc/design.rst](doc/design.rst)。
 
 - **语言**：C++17，规避 RTTI（向下转型用 libca 的 `ca::core::tag_cast::cast<T>`，不用 `dynamic_cast`）
 - **命名空间**：`jbytecode`（子模块 `jbytecode::core` / `::tree` / `::commons` / `::analysis` / `::util`）
@@ -117,7 +117,7 @@ xmake run libjbytecode_asm_core_unittest
 | `demo_*` | 可执行 | 各类用法示例（默认关闭，`--with_demo=y`） |
 
 测试纪律（资源来源、round-trip 契约边界、`skip` 使用限制）见
-[doc/safety.md](doc/safety.md#round-trip-验证边界)。
+[doc/safety.rst](doc/safety.rst) 的「Round-trip 验证边界」。
 
 ## 依赖
 
@@ -137,12 +137,14 @@ xmake run libjbytecode_asm_core_unittest
 
 ## 深入阅读
 
+设计规格（宏观层）在 `doc/*.rst`，Sphinx 站点构建：`pip install "sphinx==9.1.1" && sphinx-build -b html doc doc/_build`；API 级契约（微观层）见各头文件 `///` 注释与 `doxygen doc/Doxyfile` 生成的站点。
+
 | 文档 | 内容 |
 |------|------|
-| [doc/design.md](doc/design.md) | **总体设计总览（新接手者先读这篇）**：库定位、五模块分层、Visitor 链核心思想、两条主线数据流、「想做某事去哪找 API」导航 |
-| [doc/core.md](doc/core.md) | Core API 设计：Visitor 链、二遍扫描、常量池序列化、栈帧计算 |
-| [doc/tree.md](doc/tree.md) | Tree API 设计：节点结构、指令系统、回放机制 |
-| [doc/commons.md](doc/commons.md) | Commons 设计：Remapper 体系、Adapter 继承链 |
-| [doc/analysis.md](doc/analysis.md) | Analysis 设计：Analyzer + Interpreter 数据流框架 |
-| [doc/util.md](doc/util.md) | Util 设计：Printer/Textifier/ASMifier、Trace、CheckAdapter |
-| [doc/safety.md](doc/safety.md) | 安全使用指南：迭代器失效、accept 链契约、线程/异常安全 |
+| [doc/design.rst](doc/design.rst) | **总体设计总览（新接手者先读这篇）**：库定位、五模块分层、Visitor 链核心思想、两条主线数据流、「想做某事去哪找 API」导航 |
+| [doc/core.rst](doc/core.rst) | Core API 设计：Visitor 链、二遍扫描、常量池序列化、栈帧计算 |
+| [doc/tree.rst](doc/tree.rst) | Tree API 设计：节点结构、指令系统、回放机制 |
+| [doc/commons.rst](doc/commons.rst) | Commons 设计：Remapper 体系、Adapter 继承链 |
+| [doc/analysis.rst](doc/analysis.rst) | Analysis 设计：Analyzer + Interpreter 数据流框架 |
+| [doc/util.rst](doc/util.rst) | Util 设计：Printer/Textifier/ASMifier、Trace、CheckAdapter |
+| [doc/safety.rst](doc/safety.rst) | 安全使用指南：迭代器失效、accept 链契约、线程/异常安全 |

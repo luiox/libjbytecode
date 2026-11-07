@@ -1,3 +1,6 @@
+/// @defgroup commons_serial_version_uid_adder serialVersionUID 注入
+///
+/// 计算（SHA-1，libca crypto）并注入 serialVersionUID 字段。
 #pragma once
 
 #include <string>

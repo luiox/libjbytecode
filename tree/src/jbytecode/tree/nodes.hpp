@@ -1,4 +1,8 @@
-﻿#pragma once
+﻿/// @defgroup tree_nodes class 内存树（ClassNode/MethodNode…）
+///
+/// ClassNode/MethodNode/FieldNode/AnnotationNode 等：既是 visitor（可被填充）
+/// 也能 accept 回放；方法域节点走 owner arena。见 doc:tree-nodes。
+#pragma once
 
 #include "libca/core/any.hpp"
 #include <vector>
@@ -589,7 +593,7 @@ public:
     void accept(jbytecode::core::MethodVisitor* mv);
     void check(int api) const { (void)api; }
 
-    // ---- Label 归属（arena 盖章即所有权，见 doc/design.md §6.1）----
+    // ---- Label 归属（arena 盖章即所有权，见 doc:design-label-ownership）----
 
     /// 在本方法内容 arena 上新建 Label 并盖章 owner=this（B8 起的标准建点）。
     jbytecode::core::Label* createLabel();

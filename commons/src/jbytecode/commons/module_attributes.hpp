@@ -1,3 +1,6 @@
+/// @defgroup commons_module_attributes module 系自定义属性
+///
+/// ModuleTarget/ModuleResolution/ModuleHashes 属性节点。
 #pragma once
 
 #include <cstdint>

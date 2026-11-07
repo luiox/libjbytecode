@@ -1,3 +1,6 @@
+/// @defgroup analysis_simple_verifier 类层次感知验证器（SimpleVerifier）
+///
+/// BasicVerifier 之上用类层次信息做精确验证。
 #pragma once
 
 #include <vector>

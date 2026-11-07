@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿/// @defgroup core_opcodes 操作码与版本常量
+///
+/// 逻辑操作码、ASM API 版本（ASM8/ASM9）与类版本（V1_1 ~ V27）。
+#pragma once
 
 #include "libca/core/datatype.hpp"
 #include "jbytecode/core/frame.hpp"

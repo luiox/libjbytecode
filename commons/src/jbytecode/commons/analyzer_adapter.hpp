@@ -1,3 +1,6 @@
+/// @defgroup commons_analyzer_adapter 实时栈帧查询（AnalyzerAdapter）
+///
+/// 用 Analysis 引擎随事件流维护当前 locals/stack，供 visitor 链中间查询。
 #pragma once
 
 #include "libca/core/any.hpp"

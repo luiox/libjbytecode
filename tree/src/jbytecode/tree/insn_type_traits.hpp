@@ -1,3 +1,7 @@
+/// @defgroup tree_insn_type_traits 指令节点 tag 映射
+///
+/// TypeOf<T> 把指令子类映射到 getType() tag，配合 ca::core::tag_cast 做
+/// 无 RTTI 向下转型。
 #pragma once
 
 #include "libca/core/tag_cast.hpp"

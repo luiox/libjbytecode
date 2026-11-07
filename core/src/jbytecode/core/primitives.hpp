@@ -27,6 +27,11 @@
 ///   TypePath             ← TypePath.java
 ///   Context              ← Context.java
 ///   Handler              ← Handler.java
+
+/// @defgroup core_primitives 基础原语（Label/Handle/Attribute…）
+///
+/// Label 归属制（owner arena 盖章）、AbstractType/Edge/Handle/ConstantDynamic/
+/// TypePath/Attribute 等无复杂逻辑的共用原语。Label 契约见 doc:design-label-ownership。
 #pragma once
 
 #include <string>
@@ -354,8 +359,9 @@ private:
 class Handle
 {
 public:
-    /// @deprecated Use {@link #Handle(int, String, String, String, boolean)} instead.
-    /// isInterface is auto-detected from tag (true iff tag == H_INVOKEINTERFACE).
+    /// @deprecated 改用带 isInterface 参数的 5 参重载（Handle(int, Utf8StringRef,
+    /// Utf8StringRef, Utf8StringRef, bool)）；本重载的 isInterface 由 tag 自动判别
+    /// （当且仅当 tag == H_INVOKEINTERFACE 时为 true）。
     Handle(int tag, ca::str::Utf8StringRef owner, ca::str::Utf8StringRef name,
            ca::str::Utf8StringRef descriptor)
         : Handle(tag, owner, name, descriptor, tag == Opcodes::H_INVOKEINTERFACE)

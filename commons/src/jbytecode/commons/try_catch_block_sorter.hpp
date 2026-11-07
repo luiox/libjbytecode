@@ -1,3 +1,6 @@
+/// @defgroup commons_try_catch_block_sorter 异常表排序（TryCatchBlockSorter）
+///
+/// 按规范顺序排序方法异常表。
 #pragma once
 
 #include <algorithm>

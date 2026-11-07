@@ -1,3 +1,6 @@
+/// @defgroup analysis_small_set 小型指令集合（SmallSet）
+///
+/// 少量元素线性存储的集合，SourceValue 背后的指令集合载体。
 #pragma once
 
 #include <vector>

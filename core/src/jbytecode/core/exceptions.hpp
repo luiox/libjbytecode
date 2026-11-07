@@ -4,6 +4,12 @@
 /// 当 ClassWriter 序列化结果超出 class 文件格式硬限制，或 COMPUTE_FRAMES 不收敛时
 /// 抛出。异常类极薄（仅携带诊断字段），按 C++ 惯例保留 header-only 内联构造，
 /// 不下沉到 .cpp。解析侧的畸形输入统一抛 std::invalid_argument，不在此文件定义。
+
+/// @defgroup core_exceptions 写出侧异常族
+///
+/// ClassTooLargeException / MethodTooLargeException（std::length_error 派生）与
+/// FrameComputationException（std::runtime_error 派生）；解析侧统一抛
+/// std::invalid_argument。边界见 doc:safety-exception。
 #pragma once
 
 #include <string>

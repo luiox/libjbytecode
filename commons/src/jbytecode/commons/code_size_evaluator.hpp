@@ -1,3 +1,6 @@
+/// @defgroup commons_code_size_evaluator 字节码大小统计（CodeSizeEvaluator）
+///
+/// 统计经过的方法体字节码大小。
 #pragma once
 
 #include "libca/core/any.hpp"

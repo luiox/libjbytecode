@@ -12,6 +12,11 @@
 ///
 /// 字符串借用同一个 Utf8StringArena（构造时传入、由上层拥有），多个 Writer 可共享。
 /// 实现位于 symbol_table.cpp。
+
+/// @defgroup core_symbol_table 常量池符号表（SymbolTable）
+///
+/// CP 条目注册 + 去重的唯一落点，兼管 bootstrap 方法表与类型表；
+/// 写出侧两阶段序列化的注册阶段。见 doc:core-symbol-table。
 #pragma once
 
 #include "libca/core/datatype.hpp"

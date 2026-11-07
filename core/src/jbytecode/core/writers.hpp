@@ -1,4 +1,8 @@
-﻿#pragma once
+﻿/// @defgroup core_writers 类写出器（ClassWriter/MethodWriter）
+///
+/// visitor 事件编码回 .class 二进制：COMPUTE_MAXS/COMPUTE_FRAMES、常量池
+/// 两阶段序列化与标签正向引用回填。见 doc:core-api-writer。
+#pragma once
 
 #include <string>
 

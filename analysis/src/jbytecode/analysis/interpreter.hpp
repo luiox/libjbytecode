@@ -1,3 +1,7 @@
+/// @defgroup analysis_interpreter 抽象解释器与栈帧（Interpreter/Frame）
+///
+/// Interpreter<V> 逐指令定义抽象语义；Frame<V> 为指令处的抽象栈帧
+/// （locals + stack）。见 doc:analysis-interpreters。
 #pragma once
 
 #include <vector>

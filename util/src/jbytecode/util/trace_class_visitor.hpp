@@ -1,3 +1,6 @@
+/// @defgroup util_trace_class_visitor 双发 visitor（TraceClassVisitor）
+///
+/// ClassVisitor 装饰器：同时转发到真实 visitor 与 Printer。见 doc:util-printer。
 #pragma once
 
 #include "jbytecode/core/visitors.hpp"

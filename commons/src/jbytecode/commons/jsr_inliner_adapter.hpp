@@ -1,3 +1,7 @@
+/// @defgroup commons_jsr_inliner_adapter JSR/RET 内联消除（JsrInlinerAdapter）
+///
+/// COMPUTE_FRAMES 不支持 JSR/RET，先经本适配器内联消除。
+/// 见 doc:core-frames-limits。
 #pragma once
 
 #include <deque>

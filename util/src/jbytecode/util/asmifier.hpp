@@ -1,3 +1,6 @@
+/// @defgroup util_asmifier 等价调用代码生成（ASMifier）
+///
+/// Printer 实现：把事件流讲成等价的 ASM API 调用序列。
 #pragma once
 
 #include <unordered_map>

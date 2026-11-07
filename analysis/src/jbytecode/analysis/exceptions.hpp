@@ -1,3 +1,6 @@
+/// @defgroup analysis_exceptions 分析侧异常（AnalyzerException）
+///
+/// 分析过程中的非法操作（如空栈 pop）抛出。
 #pragma once
 
 #include <string>

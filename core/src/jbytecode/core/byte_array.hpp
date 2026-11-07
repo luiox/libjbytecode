@@ -3,6 +3,11 @@
 ///
 /// 仅是「指针 + 长度」的薄封装，不含任何方法——容量管理、扩容、读写均由持有它的
 /// ByteVector 负责。放在 ca::core 命名空间下，作为 core 模块二进制写出的基础类型。
+
+/// @defgroup core_byte_array 原始字节缓冲区（ByteArray）
+///
+/// 「指针 + 长度」薄封装，所有权语义由持有者（如 ByteVector）约定；
+/// core 模块二进制写出的基础类型。
 #pragma once
 
 #include "libca/core/datatype.hpp"

@@ -13,6 +13,11 @@
 ///   ca::u8* data_   ↔ byte[] data
 ///   ca::i32 length_ ↔ int length
 ///   ca::i32 capacity_ (隐式: data_.length)
+
+/// @defgroup core_byte_vector 大端字节写入器（ByteVector）
+///
+/// Code 属性与常量池等二进制序列化的落笔点；putMUtf8 超 64KiB 抛
+/// std::length_error（异常边界见 doc:safety-exception）。
 #pragma once
 
 #include <vector>
