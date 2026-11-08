@@ -15,7 +15,7 @@ Util（``jbytecode::util``\）提供调试/追踪/验证工具\，基于 Printer
 Printer 模式
 ------------
 
-``Printer`` 是一个**与 Visitor 镜像的事件接收器**\：每个 ``visitXxx`` 对应一个虚方法\，收集文本到公开成员 ``text``\（按行的 ``Utf8StringRef`` 视图）与累积器 ``stringBuilder``\。``Textifier`` / ``ASMifier`` 是 Printer 的两个具体实现。
+``Printer`` 是一个**与 Visitor 镜像的事件接收器**\：每个 ``visitXxx`` 对应一个虚方法\，收集文本到公开成员 ``text``\（按行的 ``Utf8StringRef`` 视图）与累积器 ``stringBuilder``\。``Textifier`` / ``ASMifier`` / ``CodeGen`` 是 Printer 的三个具体实现。
 
 .. code-block:: text
 
@@ -39,6 +39,8 @@ Printer 模式
      - 生成**人类可读**的字节码清单（指令、属性、注解）
    * - ``ASMifier``
      - 生成**等价 ASM API 调用**的源码
+   * - ``CodeGen``
+     - 代码生成辅助\：从 visit 事件生成带变量名的等价调用代码\，label 经内部 arena 命名为 ``label<N>``
    * - ``TraceClassVisitor``
      - ClassVisitor 装饰器\：同时转发到真实 visitor 和 Printer
    * - ``TraceSignatureVisitor``
