@@ -3,7 +3,7 @@
 #include "jbytecode/analysis/analyzer.hpp"
 #include "jbytecode/analysis/basic_interpreter.hpp"
 
-// B8b：测试侧 Label 统一归宿（进程寿命 scratch arena）——LabelNode() 默认构造
+// B8b：测试侧 Label 统一归宿（进程寿命 scratch arena），LabelNode() 默认构造
 // 已随旧池制度退役，Label 一律 arena 分配。
 static garena::Arena& labelScratchArena()
 {
@@ -42,7 +42,7 @@ std::unique_ptr<jbytecode::tree::MethodNode> makeAddMethod()
 // 注意：这些是首次覆盖 Analyzer::analyze() 端到端的测试（此前 22 个“真实”
 // 测试全部只直驱 interpreter 回调，从未跑过整条帧计算路径）。结构性不变量
 // 见下方各 TEST；帧内容精确断言（参数槽型/双槽语义/合并/handler 帧）见
-// 文件末尾 frameContent* 系列——原 dev_plan 待查项已由此关闭。
+// 文件末尾 frameContent* 系列，原 dev_plan 待查项已由此关闭。
 
 TEST(AnalyzerTest, frameCountMatchesInstructionCount)
 {
@@ -189,7 +189,7 @@ TEST(AnalyzerTest, instanceMethodThisLocal)
 // 帧内容精确断言（合法输入）
 //
 // 此前 analyzer 测试只断言结构性质（帧数、可达性、栈大小），移植自 ASM 的
-// 帧计算从未对「局部变量/操作数栈里到底是什么值」精确断言过（dev_plan 曾
+// 帧计算从未对局部变量/操作数栈里到底是什么值精确断言过（dev_plan 曾
 // 挂 analyzer-frame-model-suspect 待查项，文件并未落地）。以下用合法
 // 输入把 BasicInterpreter 的帧语义钉死：参数槽型、long/double 双槽语义、
 // 未用槽填充、同型合并不变、异型合并退化为 UNINITIALIZED、异常 handler
@@ -204,7 +204,7 @@ TEST(AnalyzerTest, frameContentLinearAddExactLocalsAndStack)
     auto                 frames = analyzer.analyze(ZUtf8StringRef::from_static("Demo"), m.get());
     ASSERT_EQ(4, static_cast<int>(frames.size()));
 
-    // frames[i] 是「执行第 i 条指令前」的状态
+    // frames[i] 是执行第 i 条指令前的状态
     ASSERT_NE(nullptr, frames[0]);
     EXPECT_EQ(0, frames[0]->getStackSize());
     EXPECT_TRUE(frames[0]->getLocal(0) == BasicValue::INT_VALUE);

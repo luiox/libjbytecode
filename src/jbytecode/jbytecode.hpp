@@ -1,4 +1,4 @@
-﻿/// @file        jbytecode.hpp
+/// @file        jbytecode.hpp
 /// @author      canrad (1517807724@qq.com)
 /// @brief       libjbytecode 统一入口头文件
 /// @version     0.1
@@ -67,7 +67,7 @@
 #include "jbytecode/analysis/interpreter.hpp"
 #include "jbytecode/analysis/analyzer.hpp"
 
-// util 包 — 调试/追踪/验证工具
+// util 包，调试/追踪/验证工具
 #include "jbytecode/util/printer.hpp"
 #include "jbytecode/util/textifier.hpp"
 #include "jbytecode/util/asmifier.hpp"

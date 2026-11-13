@@ -19,7 +19,7 @@ int main()
 
     // SimpleRemapper string API -- rename types in descriptors
     // (字符串线示范:经作业级 arena 注入,intern 落作业 arena;进程级 staticArena
-    // 已随 #921 批次2 整体退役,注入是唯一路径,#699/#921)
+    // 已随 #921 整体退役,注入是唯一路径,#699/#921)
     SimpleRemapper r(arena,
                      Utf8StringRef::from_cstr("java/lang/Object"),
                      Utf8StringRef::from_cstr("java/lang/Cloneable"));

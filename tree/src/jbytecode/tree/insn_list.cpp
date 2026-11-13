@@ -310,9 +310,9 @@ void FrameNode::accept(MethodVisitor* mv) const
 AbstractInsnNode*
 FrameNode::clone(garena::Arena& arena, std::unordered_map<Label*, Label*>& clonedLabels) const
 {
-    // B8：展开帧 local/stack 中 ITEM_Uninitialized 形态的 Label* 槽与指令侧携带的
+    // 展开帧 local/stack 中 ITEM_Uninitialized 形态的 Label* 槽与指令侧携带的
     // Label 同规，必须经 resolveCloneLabel 收编进目标 arena（visitFrame 收编在
-    // clone 侧的对偶）。否则跨方法克隆后，源方法 arena 先亡即槽内悬垂——
+    // clone 侧的对偶）。否则跨方法克隆后，源方法 arena 先亡即槽内悬垂，
     // 与 reader labelArena_ 悬垂同族的隐患（#994 审查 P2）。值类型槽原值拷贝。
     auto adoptCloneTypes = [&arena, &clonedLabels](const std::vector<ca::core::Any>& src) {
         std::vector<ca::core::Any> out;
@@ -359,7 +359,7 @@ void LineNumberNode::accept(MethodVisitor* mv) const
 AbstractInsnNode*
 LineNumberNode::clone(garena::Arena& arena, std::unordered_map<Label*, Label*>& clonedLabels) const
 {
-    // B8：统一走 resolveCloneLabel（未命中即建 arena 副本），不再回退引用原 label，
+    // 统一走 resolveCloneLabel（未命中即建 arena 副本），不再回退引用原 label，
     // 保证克隆体内携带的 Label 全部归属目标 arena。
     return arena.create<LineNumberNode>(line, resolveCloneLabel(arena, clonedLabels, start));
 }

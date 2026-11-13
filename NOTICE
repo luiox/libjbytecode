@@ -6,7 +6,7 @@ reading/writing/transform pipeline. It is API-compatible with, and behaviourally
 validated against, ObjectWeb ASM (https://github.com/JetBrains/asm), but it is
 not a derivative work of it: libjbytecode implements its own parser, tree model,
 visitor framework and bytecode writers. The round-trip boundary is documented in
-doc/safety.md — notably, identical input does NOT guarantee byte-identical
+doc/safety.rst: notably, identical input does NOT guarantee byte-identical
 output versus the ASM Java implementation.
 
 Earlier revisions of this library contained two functions derived from

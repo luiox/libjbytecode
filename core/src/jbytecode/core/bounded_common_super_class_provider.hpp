@@ -38,7 +38,7 @@ private:
 ///
 /// @details
 /// 把任意 provider 的 getCommonSuperClass 调用包上预算上限（默认 1 亿次）。
-/// 用途：issue #575 的防御性兜底——即使某个 provider 实现存在继承环/非单调
+/// 用途：issue #575 的防御性兜底，即使某个 provider 实现存在继承环/非单调
 /// 等死循环缺陷（如 A→B→A 继承环让上升遍历永不终止），也会在预算内抛出
 /// CommonSuperClassBudgetExceeded，由 MethodWriter 转 FrameComputationException
 /// 让调用方降级，而不是无限卡死。正常调用（合并缓存 + 环检测已修复的

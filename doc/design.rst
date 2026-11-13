@@ -3,20 +3,20 @@
 libjbytecode 总体设计
 =====================
 
-状态：定稿。面向新接手者的设计总览：用最短路径讲清楚「这个库是什么、怎么组织、想做某件事该去哪个头文件找 API」。
+状态：定稿。面向新接手者的设计总览：用最短路径讲清楚这个库是什么、怎么组织、想做某件事该去哪个头文件找 API。
 
-本文**不列举** API 名称与用法——那些写在各头文件的 Doxygen 注释里，以代码为准。想深入某个子模块的内部机制，看同目录下的专题文档（见 :ref:`design-reading`）。
+本文**不列举** API 名称与用法，那些写在各头文件的 Doxygen 注释里，以代码为准。想深入某个子模块的内部机制，看同目录下的专题文档（见 :ref:`design-reading`）。
 
 .. _design-positioning:
 
 1. 这个库是什么
 ---------------
 
-libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**，提供 Java ``.class`` 字节码的**解析、生成、分析、变换**四类能力。设计目标是「行为对齐 ASM」：visitor 事件、字节码语义和主要类型命名与 ASM 保持一致，熟悉 ASM 的人能凭直觉使用（每个头文件注释标注其对应的 ASM Java 源文件），但实现与内存模型独立演进，不是逐行移植。
+libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**，提供 Java ``.class`` 字节码的**解析、生成、分析、变换**四类能力。设计目标是行为对齐 ASM：visitor 事件、字节码语义和主要类型命名与 ASM 保持一致，熟悉 ASM 的人能凭直觉使用（每个头文件注释标注其对应的 ASM Java 源文件），但实现与内存模型独立演进，不是逐行移植。
 
 几条贯穿全库的基调，先记住它们，后面所有设计都从这里推导：
 
-- **规避 RTTI（约定层面）。** 构建当前不强制 ``/GR-``（MSVC）/ ``-fno-rtti``，但全库约束不使用 ``dynamic_cast`` / ``typeid``：所有「向下转型」一律用 ``ca::core::tag_cast::cast<T>()``\（libca core 提供的基于 tag 的安全转型）。这影响到指令节点、Value、Attribute 等所有多态层级的类型判别方式。
+- **规避 RTTI（约定层面）。** 构建当前不强制 ``/GR-``（MSVC）/ ``-fno-rtti``，但全库约束不使用 ``dynamic_cast`` / ``typeid``：所有向下转型一律用 ``ca::core::tag_cast::cast<T>()``\（libca core 提供的基于 tag 的安全转型）。这影响到指令节点、Value、Attribute 等所有多态层级的类型判别方式。
 - **Visitor（访问者）是一切的中枢。** 读、写、变换、打印、校验，全部表达为同一套 visitor 事件流的生产者/消费者。理解了 visitor 链，就理解了全库的数据流。
 - **arena + 拥有型容器代替 GC。** Java 的 GC 与 finalize 生命周期无法搬进 C++：早期按 ASM 结构直接 ``new`` 的写法靠零散 delete 补丁维持，漏删和重复删反复出现。现行模型把方法域内的指令节点与 ``Label`` 放在 owner arena 上分配、随方法域整体析构；``ClassNode`` / ``MethodNode`` 等根对象由拥有型容器或调用方 RAII 管理；跨边界的字符串和标签视图一律借用，生命期由 arena 保证。这是本实现与 ASM 最重要的差异，约束集中在 :doc:`safety`。
 - **线程不安全。** 没有任何同步原语，单线程使用或外部加锁。
@@ -34,7 +34,7 @@ libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**�
 .. code-block:: text
 
         ┌─────────────────────────────────────────────┐
-        │  core   —— 字节码读写的地基（Visitor + 二进制）│
+        │  core  : 字节码读写的地基（Visitor + 二进制）│
         └─────────────────────────────────────────────┘
                  ▲          ▲          ▲          ▲
        ┌─────────┘   ┌──────┘    ┌─────┘     ┌────┘
@@ -53,7 +53,7 @@ libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**�
 - **analysis** 还依赖 tree（分析的输入是 tree 的 ``MethodNode``\）。
 - **util** 的字节码校验部分也会用到 analysis。
 
-新接手者的阅读顺序建议：**先 core（尤其是 visitor 与读写两端），再 tree**。这两个吃透了，commons/util/analysis 都是「在 visitor 链上挂一个特定用途的节点」，看一眼就懂。
+新接手者的阅读顺序建议：**先 core（尤其是 visitor 与读写两端），再 tree**。这两个吃透了，commons/util/analysis 都是在 visitor 链上挂一个特定用途的节点，看一眼就懂。
 
 各子模块对应的源码根目录（API 头文件都在 ``<模块>/src/jbytecode/<模块>/`` 下）：
 
@@ -92,7 +92,7 @@ libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**�
 
 理解全库的钥匙只有一个概念：**一次 ``.class`` 的处理 = 一串 visitor 事件，从生产者流向消费者。**
 
-生产者把 class 的结构「讲」出来——「这是一个类」「它有个方法」「方法里第一条指令是 ALOAD_0」……每个「讲」就是一次 ``visitXxx`` 调用。消费者实现这些 ``visitXxx`` 来「听」并做事：写回二进制、建内存树、打印文本、改名字。
+生产者把 class 的结构讲出来，这是一个类它有个方法方法里第一条指令是 ALOAD_0……每个讲就是一次 ``visitXxx`` 调用。消费者实现这些 ``visitXxx`` 来听并做事：写回二进制、建内存树、打印文本、改名字。
 
 .. code-block:: text
 
@@ -107,16 +107,16 @@ libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**�
 
 **(1) 生产者和消费者是同一组接口的两面。** ``ClassVisitor`` / ``MethodVisitor`` / ``FieldVisitor`` / ``AnnotationVisitor`` / ``ModuleVisitor`` / ``RecordComponentVisitor`` 这组抽象类，既被消费者继承（实现 ``visitXxx``\），也被生产者持有（调用 ``visitXxx``\）。``ClassReader`` 读二进制后调用 visitor\；``ClassWriter`` 是 visitor、把调用编码成二进制\；``tree::ClassNode`` 既是 visitor（能被填充）又是生产者（能 ``accept`` 回放）。
 
-**(2) 委托（delegate）让 visitor 可以串成链。** 每个 visitor 可持有一个下游 ``delegate``\，默认实现把事件原样转发给 delegate（delegate 为空则退化为 no-op）。于是「变换」就是在链中间插一个**只覆盖自己关心的事件、其余转发**的 visitor：
+**(2) 委托（delegate）让 visitor 可以串成链。** 每个 visitor 可持有一个下游 ``delegate``\，默认实现把事件原样转发给 delegate（delegate 为空则退化为 no-op）。于是变换就是在链中间插一个**只覆盖自己关心的事件、其余转发**的 visitor：
 
 .. code-block:: text
 
    ClassReader ──► ClassRemapper ──► CheckClassAdapter ──► ClassWriter
                  （改类名后转发）   （顺带校验后转发）    （编码成字节）
 
-这条链里，重映射、校验、写出三件事互不知道彼此，却能叠加生效。commons/util 里的绝大多数类就是「为某个用途写好的、挂在链中间的 visitor」。
+这条链里，重映射、校验、写出三件事互不知道彼此，却能叠加生效。commons/util 里的绝大多数类就是为某个用途写好的、挂在链中间的 visitor。
 
-**(3) 层级 visitor 由父级工厂方法按需创建。** 例如 ``ClassVisitor::visitMethod`` 返回一个 ``MethodVisitor*``\（可能为 ``nullptr`` 表示「这个方法我不关心」）。这样链的分叉天然跟随 class 的嵌套结构：类→方法→注解、类→字段→注解、类→record 组件……每一层都能独立决定是否深入、是否变换。
+**(3) 层级 visitor 由父级工厂方法按需创建。** 例如 ``ClassVisitor::visitMethod`` 返回一个 ``MethodVisitor*``\（可能为 ``nullptr`` 表示这个方法我不关心）。这样链的分叉天然跟随 class 的嵌套结构：类→方法→注解、类→字段→注解、类→record 组件……每一层都能独立决定是否深入、是否变换。
 
 各 visitor 的**事件发射顺序是有契约的**（例如 ``visitCode`` 必须在指令之前、``visitMaxs`` 必须在最后）。这套顺序契约写在 :doc:`safety`\，违反会让下游 visitor（尤其 ``ClassWriter``）产出错误结果。
 
@@ -133,7 +133,7 @@ libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**�
 
    .class bytes → ClassReader.accept → [中间 visitor 链] → ClassWriter → .class bytes
 
-一遍流过，不在内存里建完整模型。适合「只改局部、其余照搬」的场景（改类名、插桩、加校验）。中间想做什么，就往链里插对应的 commons/util visitor。
+一遍流过，不在内存里建完整模型。适合只改局部、其余照搬的场景（改类名、插桩、加校验）。中间想做什么，就往链里插对应的 commons/util visitor。
 
 **B. 建树 / 随机修改（吃内存，能任意改）**
 
@@ -143,16 +143,16 @@ libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**�
                   ... 任意遍历/增删改 ClassNode/MethodNode/InsnList ...
                   ClassNode.accept → ClassWriter → .class bytes   （回放写出）
 
-当你需要「看到整个方法的指令列表、前后跳着改」时用树。tree 模块把字节码指令表示成双向链表 ``InsnList``\，节点是 ``AbstractInsnNode`` 的各子类。**分析（analysis）也以树为输入**，因为它要在指令链上构建控制流图。
+当你需要看到整个方法的指令列表、前后跳着改时用树。tree 模块把字节码指令表示成双向链表 ``InsnList``\，节点是 ``AbstractInsnNode`` 的各子类。**分析（analysis）也以树为输入**，因为它要在指令链上构建控制流图。
 
-树节点和 Label 由 owner arena 回收，跨方法域的指针共享受归属约束，迭代中增删有失效规则——这是 tree/analysis 使用时最容易踩的坑，**动手改 ``InsnList`` 前先读 :ref:`safety-iterator`**。
+树节点和 Label 由 owner arena 回收，跨方法域的指针共享受归属约束，迭代中增删有失效规则，这是 tree/analysis 使用时最容易踩的坑，**动手改 ``InsnList`` 前先读 :ref:`safety-iterator`**。
 
 .. _design-navigation:
 
 5. 想做某件事，该看哪里
 -----------------------
 
-下表是「任务 → 入口子模块 / 头文件位置」的导航。**具体类名、构造参数、方法语义看对应头文件的 Doxygen 注释**，这里只给方向。
+下表是任务 → 入口子模块 / 头文件位置的导航。**具体类名、构造参数、方法语义看对应头文件的 Doxygen 注释**，这里只给方向。
 
 .. list-table::
    :header-rows: 1
@@ -199,7 +199,7 @@ libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**�
    * - 插桩后重排局部变量槽位
      - commons
      - ``local_variables_sorter.hpp``
-   * - 实时查询「当前指令处的栈帧」
+   * - 实时查询当前指令处的栈帧
      - commons
      - ``analyzer_adapter.hpp``
    * - 内联消除 JSR/RET、合并 ``<clinit>``\、排序异常表、注入 serialVersionUID
@@ -214,7 +214,7 @@ libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**�
    * - 把 ``.class`` 反汇编成可读文本
      - util
      - ``textifier.hpp``\、``trace_class_visitor.hpp``
-   * - 生成「等价的 ASM 调用代码」
+   * - 生成等价的 ASM 调用代码
      - util
      - ``asmifier.hpp``
    * - 在 visitor 链上校验事件序列/参数合法性
@@ -229,19 +229,19 @@ libjbytecode 是 **ASM（``org.objectweb.asm``）兼容的独立 C++17 实现**�
 ASM 跑在有 GC 的 JVM 上，本实现没有 GC，所以所有权规则必须显式记住：
 
 - **树节点建点走 arena**\：指令节点经 ``MethodNode::create<T>()`` / ``InsnList::create<T>()`` 在归属方法的内容 arena 上分配，寿命 = 方法寿命，析构由 arena 逆序统一执行。``ClassNode``/``MethodNode`` 等**根对象**仍堆分配、由拥有型容器（或调用方 RAII）释放。混合清除纪律：绑定列表析构/``clear``/``set`` 对 arena 节点只摘链（arena 统一回收）、对堆节点（暂存管线产物）维持容器 ``delete``\；``remove`` 一律只摘链。详见 :doc:`safety` 的失效表。
-- **``Label`` 走归属制**\：``Label`` 带 owner arena 盖章\；方法域 label 经 ``MethodNode::createLabel()`` 在 ``nodeArena_`` 建点、随 arena 回收。visitor 边界 ``canonicalizeLabel``\：本域 label O(1) 直返，外来 label 拷贝收编（原对象归创建方）。旧「label 池 + taken 标志 + onNodeAdded 回调」制度已物理退役。详见 :ref:`design-label-ownership`\。
+- **``Label`` 走归属制**\：``Label`` 带 owner arena 盖章\；方法域 label 经 ``MethodNode::createLabel()`` 在 ``nodeArena_`` 建点、随 arena 回收。visitor 边界 ``canonicalizeLabel``\：本域 label O(1) 直返，外来 label 拷贝收编（原对象归创建方）。旧label 池 + taken 标志 + onNodeAdded 回调制度已物理退役。详见 :ref:`design-label-ownership`\。
 - **向下转型走 ``ca::core::tag_cast::cast<T>()``**\（libca core），不是 ``dynamic_cast``\。判别指令/Value 的具体类型时，用各类提供的 tag（如指令节点的 ``getType()``\、Value 的种类枚举）配合 ``tag_cast``\。
 - **字符串用 libca 的语义类型**\（``Utf8StringRef`` 借用 / ``Utf8String`` 拥有），不是 ``std::string``\。借用型不延长生命周期，注意别让底层 buffer 先析构。
 - **常量池由 ``SymbolTable`` 统一注册去重**\，不是各处自己拼。写出侧的常量池序列化是两阶段的（先注册收集、再写头和方法体），细节见 :doc:`core`\。
 
-这套模型的完整约束（迭代器失效、accept 事件顺序、线程/异常安全边界）集中在 **:doc:`safety`** ——动手写变换前必读那一篇。
+这套模型的完整约束（迭代器失效、accept 事件顺序、线程/异常安全边界）集中在 **:doc:`safety`** ，动手写变换前必读那一篇。
 
 .. _design-label-ownership:
 
 6.1 Label 所有权（owner arena 盖章，禁止跨方法共享）
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-本节为现行制度。旧的「label 池 + taken 标志 + onNodeAdded 回调」方案已移除。
+本节为现行制度。旧的label 池 + taken 标志 + onNodeAdded 回调方案已移除。
 
 ``Label`` 在 core 层（``primitives.hpp``\），带 ``owner()`` 归属锚（指向建点 arena）。``Label*`` 在 JumpInsnNode/LabelNode/TryCatchBlock/Switch/LineNumber/LocalVariable 里到处被引用，都是**借用**\；Label 的生命周期锚定在其 owner arena（即建点方法的方法域）。
 
@@ -251,7 +251,7 @@ ASM 跑在有 GC 的 JVM 上，本实现没有 GC，所以所有权规则必须�
 2. **visitor 边界收编 ``canonicalizeLabel(label)``**\：7 个携带 Label 的 visitor 在方法边界统一调用。owner == 本方法 arena：O(1) 直返（identity 保持）\；外来 label\：查 ``foreignLabels_`` 映射，未命中则拷贝收编（``{bytecodeOffset, line, flags}``\，身份换新）并登记。**原对象归创建方**\（reader 的 ``labelArena_`` / 调用方 scratch），树不 delete 外来 label。
 3. **clone 走 ``clone(arena, clonedLabels)`` 新协议**\：节点在目标 arena 分配，携带 label 经自由函数 ``resolveCloneLabel(arena, map, label)`` 解析（同域直返、map 命中直返、否则建副本登记）。``MethodNode::resolveCloneLabel`` 为其方法域便利封装。
 4. **禁止跨方法长期共享 ``Label*``**\：跨方法传递必须经 canonicalize/clone 收编为目标方法域副本。reader 借用窗口有额外约束：MethodWriter 把 Label 当 CFG 节点改写，reader 的 label 必须活到 ``toByteArray()``\（见 ``readers.hpp`` 的借约注释）。
-5. **Label 可以是 arena 产物也可以是调用方 scratch 产物**——owner 盖章是判别依据，不再要求「必须裸 new」。栈 Label 仍禁止（生命周期不足）。
+5. **Label 可以是 arena 产物也可以是调用方 scratch 产物**，owner 盖章是判别依据，不再要求必须裸 new。栈 Label 仍禁止（生命周期不足）。
 
 .. _design-build:
 
@@ -261,7 +261,7 @@ ASM 跑在有 GC 的 JVM 上，本实现没有 GC，所以所有权规则必须�
 - 子库目标\：``libjbytecode_core`` / ``_tree`` / ``_commons`` / ``_analysis`` / ``_util``\，聚合目标 ``libjbytecode``\。最小可用只需 core（+ libca / libjstr / libgarena 包）。
 - 测试默认关闭\，``xmake f --with_tests=y`` 打开\；demo 默认关闭\，``--with_demo=y`` 打开。
 - 每个子模块有独立的 ``*_unittest`` 目标\；core 另有一份与 ASM 参考输出做结构化对拍的回归测试。
-- 具体命令见 ``README.md``\「构建目标」与「快速开始」。
+- 具体命令见 ``README.md``\构建目标与快速开始。
 
 .. _design-reading:
 

@@ -649,7 +649,7 @@ void MethodWriter::visitLdcInsn(const Any& value)
 #ifndef NDEBUG
         // 字符串线护栏(总方案 §5.2-3):本分支保留作兼容兜底,但新代码应经作业级
         // arena intern 成 Utf8StringRef 再装箱。debug 构建下首次触发即报告,
-        // 让残留违规可见 —— 这是字符串线的"dangle_check 时刻"。
+        // 让残留违规可见，这是字符串线的"dangle_check 时刻"。
         static std::atomic<bool> fallbackWarned{false};
         if (!fallbackWarned.exchange(true)) {
             CA_LOG_WARN("[garena] writer fallback intern fired: Any(std::string) reached "
@@ -1025,7 +1025,7 @@ void MethodWriter::visitFrameEnd()
 }
 
 // ======================================================================
-// putFrame — compress and write currentFrame to stackMapTableEntries (ASM L1860-1950)
+// putFrame: compress and write currentFrame to stackMapTableEntries (ASM L1860-1950)
 // ======================================================================
 
 void MethodWriter::putFrame()
@@ -1295,7 +1295,7 @@ void MethodWriter::computeAllFrames()
             Label* successorBlock = outgoingEdge->successor->getCanonicalInstance();
             if (successorBlock->frame == nullptr) {
                 // 防御（#575 崩溃复现）：跳转目标从未 visitLabel（调用方畸形结构，
-                // 如 blockShuffle 重排丢失 label 节点）——补空 frame 让 fixpoint
+                // 如 blockShuffle 重排丢失 label 节点），补空 frame 让 fixpoint
                 // 可处理，而不是解引用 null 崩溃。
                 successorBlock->frame = new Frame(successorBlock);
             }
@@ -1305,7 +1305,7 @@ void MethodWriter::computeAllFrames()
                     symbols_, *successorBlock->frame, outgoingEdge->info, typeResolver_);
             }
             catch (const CommonSuperClassBudgetExceeded&) {
-                // 装饰器预算超限：provider 内部死循环（如继承环）的最后防线——
+                // 装饰器预算超限：provider 内部死循环（如继承环）的最后防线，
                 // 转 FrameComputationException 让调用方按 frame_not_converged 降级。
                 throw FrameComputationException(
                     classWriter_.getClassName().to_std_string(), nameStr_.to_std_string(),

@@ -190,7 +190,7 @@ jbytecode::core::Label*
 MethodNode::resolveCloneLabel(std::unordered_map<jbytecode::core::Label*, jbytecode::core::Label*>& map,
                               jbytecode::core::Label* label)
 {
-    // B8：委托自由函数（arena=nodeArena_），拷贝逻辑单点维护（见 insn_list.cpp）。
+    // 委托自由函数（arena=nodeArena_），拷贝逻辑单点维护（见 insn_list.cpp）。
     return jbytecode::tree::resolveCloneLabel(nodeArena_, map, label);
 }
 

@@ -9,14 +9,14 @@
 #include "jbytecode/tree/insn_list.hpp"
 #include "libca/str/utf8_string_arena.hpp"
 
-// 字符串线示范(总方案 §5.1)+ #921 staticArena 退役:BasicInterpreter 注入构造 ——
+// 字符串线示范(总方案 §5.1)+ #921 staticArena 退役:BasicInterpreter 注入构造 ，
 // ANEWARRAY 合成描述符 intern 进注入的作业 arena;兜底构造(无注入)intern 回落
-// 实例私有 fallbackArena_,随解释器析构回收。进程级 staticArena 本体已随批次2
-// 整体删除——注入/实例池是仅有的落点(结构保证,无池可泄)。
+// 实例私有 fallbackArena_,随解释器析构回收。进程级 staticArena 本体已随 #921 删除
+// 整体删除，注入/实例池是仅有的落点(结构保证,无池可泄)。
 //
 // 观测口径:BasicValue 折叠到 REFERENCE_VALUE 单例,不保留具体数组型,故注入效果
 // 以 intern 落点(arena.size())判定;测试体内不得调用旧无参 getDescriptor 检视
-// (该重载已随 #921 批次2 删除)。
+// (该重载已随 #921 删除)。
 
 using namespace jbytecode::analysis;
 using namespace jbytecode::core;

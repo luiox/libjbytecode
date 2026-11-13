@@ -1,4 +1,4 @@
-﻿/// @defgroup tree_insn_list 指令双向链表（InsnList 与指令节点）
+/// @defgroup tree_insn_list 指令双向链表（InsnList 与指令节点）
 ///
 /// InsnList 与 AbstractInsnNode 全部 16 个子类；arena/堆混合清除纪律与
 /// 迭代器失效规则见 doc:safety-iterator。
@@ -369,15 +369,15 @@ public:
 };
 
 // ============================================================
-// InsnList — 双向链表容器
+// InsnList: 双向链表容器
 // ============================================================
 
 /// @brief Doubly-linked list of AbstractInsnNode, owned by MethodNode::instructions.
 ///
 /// 生命周期模型（P2 收编）：绑定 owner arena 的列表（MethodNode::instructions）中，
-/// 节点由该 garena::Arena 分配并随方法域整体析构——set/clear/removeAndDelete 对
+/// 节点由该 garena::Arena 分配并随方法域整体析构，set/clear/removeAndDelete 对
 /// arena 节点只摘链不销毁；未绑定 arena 的临时列表（scratch/holding）以及尚未迁移的
-/// 堆分配节点维持旧的「容器负责 delete」语义（混合清除，见 disposeNode）。
+/// 堆分配节点维持旧的容器负责 delete语义（混合清除，见 disposeNode）。
 class InsnList
 {
 public:
@@ -422,7 +422,7 @@ public:
     void set(AbstractInsnNode* oldNode, AbstractInsnNode* newNode);
     /// 摘链不删：arena 节点由 arena 统一回收；堆节点释放责任转移给调用方。
     void remove(AbstractInsnNode* node);
-    /// @brief 摘链并销毁堆节点（arena 节点只摘链）：「摘除即弃」的唯一合法路径。
+    /// @brief 摘链并销毁堆节点（arena 节点只摘链）：摘除即弃的唯一合法路径。
     /// debug 下有活跃迭代器时断言失败。
     void removeAndDelete(AbstractInsnNode* node);
     /// debug 下有活跃迭代器时断言失败（clear 会析构堆节点，迭代中调用必 UAF）。
@@ -453,24 +453,24 @@ public:
 
     // -- 迭代器 --
 private:
-    /// 活跃迭代器计数（begin/end 登记）：set/removeAndDelete/clear 的「迭代中改表」
+    /// 活跃迭代器计数（begin/end 登记）：set/removeAndDelete/clear 的迭代中改表
     /// debug 断言依据（doc:safety-iterator 失效表）。读写仅 debug 生效，release 只占位。
     /// #1065：本字段声明严禁被 NDEBUG 门控。InsnList 是跨 TU 共享布局的类型
     /// （内嵌 MethodNode、由 libjbytecode 本体方法就地改写、消费方经内联访问器
     /// 读写）：门控声明使 NDEBUG TU 与非 NDEBUG TU 的 size_ 等成员偏移漂移 8 字节
     /// （ODR 违规），混链后消费方 size() 读到 ownerArena_ 低半（垃圾堆地址）、
-    /// 析构走错位字段——上游单测 LlvmIrBackendTest 堆损坏实证（测试 target
+    /// 析构走错位字段，上游单测 LlvmIrBackendTest 堆损坏实证（测试 target
     /// 去 NDEBUG #1063 后显形）。字段恒在（两种构建 sizeof 一致），release 无读写。
     /// 声明须先于 Iterator：MSVC 对嵌套类内联体引用后置类成员报 C2039。
     mutable int activeIterators_ = 0;
 public:
     /// 活跃迭代器布局指纹（定义在 insn_list.cpp = libjbytecode 本体 TU）：
     /// 返回 lib 侧 sizeof(InsnList)。消费 TU（尤其去 NDEBUG 的测试 target）
-    /// 与本地 sizeof(InsnList) 对比即可检出「NDEBUG 门控字段」等跨 TU 布局
+    /// 与本地 sizeof(InsnList) 对比即可检出NDEBUG 门控字段等跨 TU 布局
     /// 漂移，不再表现为神秘堆损坏（#1065 回归守卫）。
     static unsigned long long layoutProbeSizeof();
     /// 原始指针遍历器。debug 构建下经 begin()/end() 取得的迭代器会向所属 InsnList
-    /// 登记活跃计数，使 set/removeAndDelete/clear 的「迭代中改表」断言可执行；
+    /// 登记活跃计数，使 set/removeAndDelete/clear 的迭代中改表断言可执行；
     /// 直接构造的迭代器不登记（仓内无此用法）。release 下零额外开销。
     /// 注：Iterator 仅在单一 TU 内创建与消费（begin/end 内联、循环体同 TU），
     /// 不跨 TU 传递，其 debug 专属成员 owner_ 不构成跨 TU 布局风险。

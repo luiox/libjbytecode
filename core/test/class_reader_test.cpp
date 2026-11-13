@@ -1333,7 +1333,7 @@ TEST(ClassReaderTest, preservesUnpairedSurrogateLdcAcrossRoundTrip)
 }
 
 // 回归测试（main linux CI 上游单测 段错误根因）：readCode 曾以
-// `readConst(...).as<Handle>()` 读取 indy 的 bootstrap method handle——readConst
+// `readConst(...).as<Handle>()` 读取 indy 的 bootstrap method handle，readConst
 // 返回的临时 Any 在语句末析构即 delete 内部 Handle，下一行 `*bsmHandlePtr` 是
 // use-after-free。glibc（≥2.34）free 会覆写已释放块前 16 字节
 // {protected next, 随机 tcache_key}，恰好砸掉 Handle 的 tag_ + owner_.data_：

@@ -1255,7 +1255,7 @@ void ClassReader::readCode(MethodVisitor* mv, Context& ctx, int codeOff)
         if (expandFrames) {
             computeImplicitFrame(ctx);
         }
-        // (No pre-scan needed — readVerificationTypeInfo creates labels for ITEM_UNINITIALIZED on
+        // (No pre-scan needed: readVerificationTypeInfo creates labels for ITEM_UNINITIALIZED on
         // the fly)
     }
 
@@ -1481,7 +1481,7 @@ void ClassReader::readCode(MethodVisitor* mv, Context& ctx, int codeOff)
             int  bsmIdx    = readUnsignedShort(indyOff);
             int  bsmOff    = bootstrapMethodOffset(bsmIdx);
             // readConst 返回值必须先落局部变量：临时 Any 在语句末析构即 delete 内部
-            // Handle，悬垂指针下一行才拷贝——glibc free 会覆写前 16 字节（tcache
+            // Handle，悬垂指针下一行才拷贝，glibc free 会覆写前 16 字节（tcache
             // next/key 正好砸在 tag_ + owner_.data 上），Linux 上以 SIGSEGV 收场
             //（MSVC 不复用不清零，恰好幸存，Windows 全绿的 UB）。
             const Any bsmConst = readConst(readUnsignedShort(bsmOff), buf);
@@ -2571,7 +2571,7 @@ void ClassReader::computeImplicitFrame(Context& context)
 
 /// 帧自洽保证（收口两处出口）：对抗性 classfile 可能声明小于实际实参槽位数的
 /// maxLocals，此时计数会超过按 maxLocals 预填的缓冲。把缓冲扩到计数、缺省填 TOP，
-/// 保证 visitFrame 的 (numLocal, local.size()) 自洽——否则 MethodWriter 展开帧时
+/// 保证 visitFrame 的 (numLocal, local.size()) 自洽，否则 MethodWriter 展开帧时
 /// 按 numLocal 越界读 local（debug 必崩，release 静默写出垃圾 StackMapTable）。
 void ClassReader::finishImplicitFrameLocals(Context& context, int numLocal)
 {

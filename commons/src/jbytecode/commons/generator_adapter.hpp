@@ -182,7 +182,7 @@ protected:
                      ca::str::Utf8StringRef name, ca::str::Utf8StringRef descriptor);
 
 private:
-    /// B8：本 adapter 产生的 Label 归宿（scratch）。外来堆 Label 被下游
+    /// 本 adapter 产生的 Label 归宿（scratch）。外来堆 Label 被下游
     /// MethodNode visitor 边界 canonicalize 拷贝收编后原对象无人释放
     /// （旧池时代由池回收），arena 化使其寿命 = adapter 生命周期。
     garena::Arena labelArena_;

@@ -206,7 +206,7 @@ TEST(GeneratorAdapterTest, testLoadThis_staticThrows)
 namespace {
 
 /// #1068 R19-F1 红验访客：在 visitMethod 内把 exceptions 内部名的字节与
-/// 地址哨兵留档。旧实现（#921 批次2）里 ARRAY 排序项的 ref 指向
+/// 地址哨兵留档。旧实现（#921）里 ARRAY 排序项的 ref 指向
 /// getInternalNames 函数级局部 scratch arena，本访客被调时该 arena 已析构，
 /// 读到的已是释放内存（ASan: heap-use-after-free；无 ASan debug 堆为 0xDD 死区填充）。
 struct ExceptionsRecordingClassVisitor : jbytecode::core::ClassVisitor
@@ -241,7 +241,7 @@ std::vector<ca::u8> toBytes(const char* s)
 /// #1068 R19-F1：5 参构造函数对 ARRAY 排序 exceptions 曾把 internal name
 /// intern 进 getInternalNames 的函数级局部 scratch，visitMethod 在 scratch
 /// 死后消费悬垂 ref。合法 JVM 异常恒为 class 排序（当前不可达），但本构造
-/// 函数是 public API，接受任意 Type 向量——用 ARRAY 排序输入钉住该分支：
+/// 函数是 public API，接受任意 Type 向量，用 ARRAY 排序输入钉住该分支：
 /// visitMethod 时读到的字节必须与期望内部名逐字节一致（修复前 ASan 红）。
 TEST(GeneratorAdapterTest, testConstructor_arraySortExceptionInternalName_notDangling)
 {

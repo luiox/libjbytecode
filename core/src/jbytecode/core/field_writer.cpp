@@ -1,5 +1,5 @@
-﻿/// @file        field_writer.cpp
-/// @brief       FieldWriter implementation — collects field_info data during visit*,
+/// @file        field_writer.cpp
+/// @brief       FieldWriter implementation: collects field_info data during visit*,
 ///              provides accessors for ClassWriter to serialize.
 ///
 ///              Follows ASM FieldWriter.java semantics.

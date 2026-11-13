@@ -24,7 +24,7 @@ LabelNode* findLabelNode(InsnList& insns, Label* label)
 
 /// Instantiation 节点级克隆映射换算到 Label 级后的取值（JSR 内联专用）。
 /// 命中直返；未命中（畸形输入：跳转目标无对应 LabelNode）沿用旧协议
-/// getClonedLabel 的兜底语义——在宿主方法 arena 新建副本并登记
+/// getClonedLabel 的兜底语义，在宿主方法 arena 新建副本并登记
 /// （迁移前为堆副本，映射随后续 clone 调用各自重建而不共享）。
 Label* clonedLabelOf(JSRInlinerAdapter&                   owner,
                      std::unordered_map<Label*, Label*>& labelMap,
@@ -214,7 +214,7 @@ void JSRInlinerAdapter::emitCode()
     instructions   = std::move(newInstructions);
     tryCatchBlocks = std::move(newTryCatchBlocks);
     localVariables = std::move(newLocalVariables);
-    // B8：emit 产物（节点与 Label）全部归属本方法 arena，Label 收编由
+    // emit 产物（节点与 Label）全部归属本方法 arena，Label 收编由
     // visitor 边界 canonicalizeLabel 承担，无需接管钩子（B8b 已随旧池退役）。
 }
 
@@ -277,11 +277,11 @@ void JSRInlinerAdapter::emitInstantiation(Instantiation&                   insta
             }
             else {
                 // B8 迁移：克隆产物全部改由本方法 arena 分配。label 携带节点不能直接
-                // 走 clone(arena, map) 新协议——resolveCloneLabel 对「label 已归属目标
-                // arena」直返原身份，而本适配器的源 label 全部归属 this->arena()（方法
+                // 走 clone(arena, map) 新协议，resolveCloneLabel 对label 已归属目标
+                // arena直返原身份，而本适配器的源 label 全部归属 this->arena()（方法
                 // 边界 canonicalize 收编），直返会令克隆跳转指向未在新指令流中出现的
                 // 原 label（悬空）。JSR 内联需要每次实例化为同一原 label 换取全新身份
-                // 且合并连续 label，与 clone 协议「同域不换身份 + 1:1 映射」模型冲突，
+                // 且合并连续 label，与 clone 协议同域不换身份 + 1:1 映射模型冲突，
                 // 故保留 Instantiation 的节点级映射（双 map 不能统一的评估结论见
                 // hpp），仅在此唯一换算点折算成 Label 级映射，携带 Label 的四类节点
                 // 手工换线，其余节点直通新协议。

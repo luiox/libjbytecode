@@ -1,5 +1,5 @@
-﻿/// @file        annotation_writer.cpp
-/// @brief       AnnotationWriter implementation — generates 'annotation' / 'type_annotation'
+/// @file        annotation_writer.cpp
+/// @brief       AnnotationWriter implementation: generates 'annotation' / 'type_annotation'
 ///              JVMS structures (JVMS 4.7.16, 4.7.20).
 ///
 ///              Follows ASM AnnotationWriter.java semantics: collect element_value data
@@ -92,7 +92,7 @@ void AnnotationWriter::visit(Utf8StringRef name, const Any& value)
         el.sval = symbols_.arena().intern("(ConstDynamic)");
     }
     else {
-        // Unknown type — store as string via arena.
+        // Unknown type: store as string via arena.
         el.tag  = 's';
         el.sval = symbols_.arena().intern("(unknown)");
     }
@@ -140,7 +140,7 @@ AnnotationVisitor* AnnotationWriter::visitArray(Utf8StringRef name)
 void AnnotationWriter::writeElement(ByteVector& out, const Element& el)
 {
     // '[' and '@' elements have their children serialized separately
-    // via putAnnotation() — they already contain their own type_index/num_pairs header.
+    // via putAnnotation(): they already contain their own type_index/num_pairs header.
     switch (el.tag) {
     case 'B':   // byte
         out.put12('B', cpIdx(symbols_.addConstantInteger(el.ival)));
@@ -258,7 +258,7 @@ void AnnotationWriter::putAnnotation(ByteVector& out)
     out.putShort(static_cast<int>(elements_.size()));
     for (const auto& el : elements_) {
         if (named_) {
-            // Named mode: normal annotation — element_name_index is always required
+            // Named mode: normal annotation: element_name_index is always required
             out.putShort(el.name.data() != nullptr && el.name.byte_length() > 0
                              ? symbols_.addConstantUtf8(el.name)
                              : 0);
@@ -321,7 +321,7 @@ void AnnotationWriter::putTypeAnnotation(ByteVector& out)
     const int sort = static_cast<unsigned>(typeRef_) >> 24;
     if (sort == TypeReference::LOCAL_VARIABLE || sort == TypeReference::RESOURCE_VARIABLE) {
         // offset 目标形态（JVMS 4.7.20.1）：target_type + u2 table_length +
-        // { u2 start_pc; u2 length; u2 index; }[]。偏移读 Label 解析值——
+        // { u2 start_pc; u2 length; u2 index; }[]。偏移读 Label 解析值，
         // put 阶段指令已写出、跳转已 resolve（TypeReference::putTarget 不支持
         // 这两个目标类型，故在此分派）。
         out.putByte(static_cast<ca::u8>(sort));

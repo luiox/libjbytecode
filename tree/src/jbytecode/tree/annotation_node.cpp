@@ -58,7 +58,7 @@ void AnnotationNode::visit(ca::str::Utf8StringRef name, const ca::core::Any& val
     else if (value.is<Type>()) {
         el.tag = 'c';
         // #921 staticArena 退役：字节仅本调用内瞬时消费（立即深拷贝进 el.sval），确无
-        // owner 上下文——按裁决①给显式函数级局部 arena，零驻留。
+        // owner 上下文，按裁决①给显式函数级局部 arena，零驻留。
         ca::str::Utf8StringArena scratch;
         const auto               d = value.cast<Type>().getDescriptor(scratch);
         el.sval = ca::str::Utf8String::from_data_unchecked(d.data(), d.byte_length());

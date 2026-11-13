@@ -476,7 +476,7 @@ int Frame::getConcreteOutputType(int abstractOutputType, int numStack)
 }
 
 // ======================================================================
-// execute() — Instruction simulation (ASM Frame.java L692-1120)
+// execute(): Instruction simulation (ASM Frame.java L692-1120)
 // ======================================================================
 
 void Frame::execute(int opcode, int arg, Symbol* argSymbol, SymbolTable& symbolTable)

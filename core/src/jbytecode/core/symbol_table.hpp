@@ -1,7 +1,7 @@
-﻿/// @file        symbol_table.hpp
+/// @file        symbol_table.hpp
 /// @brief       常量池 / bootstrap 方法 / 类型表的注册与去重中心。对标 ASM SymbolTable.java。
 ///
-/// ClassWriter 写出时所有「往常量池里塞一个条目」的请求都经过 SymbolTable：它负责
+/// ClassWriter 写出时所有往常量池里塞一个条目的请求都经过 SymbolTable：它负责
 /// 分配索引、按内容去重（同一 UTF8/Class/Methodref 只存一份）、并把条目的二进制形式
 /// 缓存进内部 ByteVector，最终在 putConstantPool() 一次性写出。
 ///
@@ -34,8 +34,8 @@ class Label;
 
 /// @brief 常量池 / bootstrap / 类型表里的一个条目。对标 ASM Symbol.java。
 ///
-/// 字段含义随 tag 不同而复用（owner/name/value/data/info 是「多用途槽位」，与 ASM 一致）。
-/// 拷贝被禁用——Symbol 由 SymbolTable 拥有并以指针对外暴露。
+/// 字段含义随 tag 不同而复用（owner/name/value/data/info 是多用途槽位，与 ASM 一致）。
+/// 拷贝被禁用，Symbol 由 SymbolTable 拥有并以指针对外暴露。
 class Symbol
 {
 public:

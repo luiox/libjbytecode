@@ -1,6 +1,6 @@
 /// 局部变量类型注解 reader→tree→writer 往返（#994 审查 P2/P3，ASM 兼容性缺口）：
 /// MethodNode 此前未覆写 visitLocalVariableAnnotation（vector<Label*> 形态），
-/// 基类默认实现转发 mv=nullptr 直接丢弃事件——注解在树中无存储、写回自然缺失。
+/// 基类默认实现转发 mv=nullptr 直接丢弃事件，注解在树中无存储、写回自然缺失。
 /// 修复：MethodNode 覆写存储（起止范围 Label 经 canonicalizeLabel 收编，B8），
 /// replayMethodBody 原序重发（既有代码），MethodWriter 新增 Code 属性
 /// Runtime(In)VisibleTypeAnnotations 写出。
@@ -132,7 +132,7 @@ TEST(LocalVariableTypeAnnotationTest, roundtripPreservesAnnotationsAndLabelSpans
     ASSERT_EQ(1u, lvaInv->elements.size());
     EXPECT_EQ(7, lvaInv->elements[0].ival);
 
-    // Label 归属方法 arena（B8：收编副本，非 reader 原对象——reader 已析构）
+    // Label 归属方法 arena（收编副本，非 reader 原对象，reader 已析构）
     EXPECT_EQ(static_cast<const void*>(&m->arena()), lva->start[0]->owner());
     EXPECT_EQ(static_cast<const void*>(&m->arena()), lva->end[0]->owner());
     // Label 落点：起止与指令侧对应 LabelNode 同一（身份共享，写回偏移一致）

@@ -1,5 +1,5 @@
-﻿/// @file        signature_writer.cpp
-/// @brief       SignatureWriter 实现 — 从 writers.hpp 内联实现迁移而来。
+/// @file        signature_writer.cpp
+/// @brief       SignatureWriter 实现，从 writers.hpp 内联实现迁移而来。
 ///              对标 org.objectweb.asm.signature.SignatureWriter。
 ///
 

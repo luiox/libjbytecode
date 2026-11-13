@@ -9,7 +9,7 @@
 #include "jbytecode/analysis/simple_verifier.hpp"
 #include "jbytecode/analysis/source_interpreter.hpp"
 
-// B8b：测试侧 Label 统一归宿（进程寿命 scratch arena）——LabelNode() 默认构造
+// B8b：测试侧 Label 统一归宿（进程寿命 scratch arena），LabelNode() 默认构造
 // 已随旧池制度退役，Label 一律 arena 分配。
 static garena::Arena& labelScratchArena()
 {
@@ -257,7 +257,7 @@ TEST(SourceInterpreterBoundaryStressTest, WideProducerSizeSurvivesCopy)
 // 永远为 false，导致 ldc "字符串" 推断为 UNINITIALIZED_VALUE，紧随的 invokevirtual
 // 取 String 引用参数时报 "Expected argument 1 Ljava/lang/String;, but got ."。
 // 此处构造 issue 最小复现场景（System.out.println("hi")）并用 BasicVerifier
-// 跑完整帧分析——这正是 patch_validate_jasm / method_validate_jasm 的校验路径。
+// 跑完整帧分析，这正是 patch_validate_jasm / method_validate_jasm 的校验路径。
 TEST(LdcStringRegression742Test, Utf8StringRefLdcInfersStringReference)
 {
     BasicInterpreter interpreter;

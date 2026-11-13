@@ -33,8 +33,8 @@ TEST(AnalyzerAdapterTest, testVisitFrame_invalidFrameType)
                  std::invalid_argument);
 }
 
-// 字符串线示范(总方案 §5.1):AnalyzerAdapter 的 arena 注入 —— ANEWARRAY 合成
-// 描述符 intern 进注入的作业 arena;进程级 staticArena 已随 #921 批次2 删除,
+// 字符串线示范(总方案 §5.1):AnalyzerAdapter 的 arena 注入，ANEWARRAY 合成
+// 描述符 intern 进注入的作业 arena;进程级 staticArena 已随 #921 删除,
 // 注入是唯一 intern 落点(结构保证,无池可泄)。
 TEST(AnalyzerAdapterTest, anewArrayInternsIntoInjectedArena)
 {

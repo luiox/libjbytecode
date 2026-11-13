@@ -1,4 +1,4 @@
-﻿/// @defgroup tree_nodes class 内存树（ClassNode/MethodNode…）
+/// @defgroup tree_nodes class 内存树（ClassNode/MethodNode…）
 ///
 /// ClassNode/MethodNode/FieldNode/AnnotationNode 等：既是 visitor（可被填充）
 /// 也能 accept 回放；方法域节点走 owner arena。见 doc:tree-nodes。
@@ -507,8 +507,8 @@ public:
         // 帧 local/stack 中 ITEM_Uninitialized 形态的 Label*（ClassReader 自
         // labelArena_ 产出，见 readVerificationTypeInfo）与跳转目标 Label 同为
         // 外来对象：必须经 canonicalizeLabel 随方法边界收编（B8，readers.hpp 的
-        // 「树不持有 reader Label」契约）。漏收编时 FrameNode 持裸 Label*，reader
-        // 析构释放 labelArena_ 后即悬垂——flags=0 写回（成员删除族）的
+        // 树不持有 reader Label契约）。漏收编时 FrameNode 持裸 Label*，reader
+        // 析构释放 labelArena_ 后即悬垂，flags=0 写回（成员删除族）的
         // visitFrame→putVerificationTypeInfo→Label::put→isResolved 首先踩中
         // use-after-free（COMPUTE_FRAMES 写回因 MethodWriter::visitFrame 对
         // COMPUTE_ALL_FRAMES 早退而掩盖）。
@@ -726,7 +726,7 @@ public:
 };
 
 /// @brief debug 抽样断言：ClassNode 关键字符串视图确属给定 arena（reader 借用 arena 制护栏）。
-/// @details 治理方案 §2.4-2「跨结构 ref 提升门禁」的接线点：reader.accept 完成后，
+/// @details 治理方案 §2.4-2跨结构 ref 提升门禁的接线点：reader.accept 完成后，
 ///          在 arena 与 ClassNode 同处作用域的装配侧调用；抽样 name/superName/signature/
 ///          接口名/首个成员的 name+desc（非空才查，空视图 owns() 恒 false 属合法缺省）。
 ///          失配即 fprintf + abort（诊断收敛在本 .cpp，遵循 coding-rules §7）。
