@@ -37,7 +37,7 @@ private:
         /// 节点级克隆映射（原 LabelNode → 克隆 LabelNode），承担两项 clone 协议
         /// Label*→Label* 映射表达不了的语义：① 连续 label 合并为同一克隆节点
         /// （多对一）；② 每次实例化为同一原 label 换取全新身份。B8 评估结论：
-        /// 不能与 clone(arena, map) 的 Label 映射统一——resolveCloneLabel 对已归属
+        /// 不能与 clone(arena, map) 的 Label 映射统一，resolveCloneLabel 对已归属
         /// 目标 arena 的 label 直返原身份（同域不换身份），而 JSR 内联恰需在
         /// 本方法 arena 内反复换身份，故保留本映射，仅在 emitInstantiation 的
         /// 唯一换算点折算成 Label 级映射。

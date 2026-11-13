@@ -1,5 +1,5 @@
-﻿/// @file        record_component_writer.cpp
-/// @brief       RecordComponentWriter 实现 — 从 writers.hpp 内联实现迁移而来。
+/// @file        record_component_writer.cpp
+/// @brief       RecordComponentWriter 实现，从 writers.hpp 内联实现迁移而来。
 ///              对标 org.objectweb.asm.RecordComponentWriter。
 ///
 ///              原本全部内联在 writers.hpp 中，违反"声明/实现分离"约定，

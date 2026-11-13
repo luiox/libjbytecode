@@ -1,4 +1,4 @@
-﻿/// @defgroup core_readers 类读取器（ClassReader）
+/// @defgroup core_readers 类读取器（ClassReader）
 ///
 /// 把 .class 二进制讲成 visitor 事件流的生产者：二遍扫描解析 Code 属性，
 /// 支持 SKIP_CODE/SKIP_DEBUG/SKIP_FRAMES/EXPAND_FRAMES。见 doc:core-two-pass。
@@ -32,7 +32,7 @@
 namespace jbytecode::core {
 
 // ============================================================================
-// ClassReader — 对标 org.objectweb.asm.ClassReader
+// ClassReader: 对标 org.objectweb.asm.ClassReader
 // 原独立于 class_reader.hpp，现并入 readers.hpp 以保持 Reader 聚合。
 // ============================================================================
 
@@ -226,7 +226,7 @@ private:
     /// 无界访问 bootstrapMethodOffsets_ 是越界读（UB）；经本辅助统一校验。
     ca::i32             bootstrapMethodOffset(ca::i32 index) const;
 
-    /// B8：reader 侧 Label 统一建点——labelArena_ 分配 + owner 盖章。
+    /// reader 侧 Label 统一建点，labelArena_ 分配 + owner 盖章。
     Label* newReaderLabel()
     {
         auto* label = labelArena_.create<Label>();
@@ -309,7 +309,7 @@ private:
 };
 
 // ============================================================================
-// SignatureReader — 对标 org.objectweb.asm.signature.SignatureReader
+// SignatureReader: 对标 org.objectweb.asm.signature.SignatureReader
 // 原全部内联实现，已移至 signature_reader.cpp。
 // ============================================================================
 

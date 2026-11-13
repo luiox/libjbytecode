@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""代码引用面门禁：规范见 CONTRIBUTING.md「文档规范」。
+"""代码引用面门禁：规范见 CONTRIBUTING.md文档规范。
 
 只认三类可校验事实，其余一律失败：
 
@@ -10,8 +10,8 @@
    CONTRIBUTING/SECURITY/CHANGELOG）；跨仓出处必须带仓名标记
    （libjbytecode / libca / libjstr / luiox / ASM 等），带标记即视为 prose，
    不做存在性校验。
-4. RST 里「``X`` 头注」指向微观层：``X`` 必须是某个 ``@defgroup`` 组名或某个
-   头文件名。宏观规格不许指向不存在的组注释——那一半内容就失踪了。
+4. RST 里``X`` 头注指向微观层：``X`` 必须是某个 ``@defgroup`` 组名或某个
+   头文件名。宏观规格不许指向不存在的组注释，那一半内容就失踪了。
 
 用法：python doc/check_refs.py [仓库根]
 """
@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 # 代码面：源码、测试、构建脚本。人读文档（README/CONTRIBUTING）不在此列，
-# 它们引用 .md 是允许的。本仓是「聚合根 + 五子模块目录」布局：每个子模块目录
+# 它们引用 .md 是允许的。本仓是聚合根 + 五子模块目录布局：每个子模块目录
 # 自带 src/test，全部纳入扫描；build/ 与 .git/ 不在列，天然被排除。
 CODE_ROOTS = ("src", "analysis", "commons", "core", "tree", "util", "demo",
               "asm-test", "test_helper", "xmake.lua")
@@ -53,7 +53,7 @@ MICRO_ROOTS = ("src", "analysis/src", "commons/src", "core/src", "tree/src", "ut
 
 
 def micro_targets(root: Path):
-    """微观层可被「X 头注」点名的锚点：@defgroup 组名 + 头文件名/.stem。"""
+    """微观层可被X 头注点名的锚点：@defgroup 组名 + 头文件名/.stem。"""
     groups, headers = set(), set()
     for spec in MICRO_ROOTS:
         src_root = root / spec
@@ -150,7 +150,7 @@ def check(root: Path):
                 if any(marker in line for marker in UPSTREAM_MARKERS):
                     continue
                 problems.append(
-                    f"{p.name}:{lineno}: 文档点名 markdown 规格 {m.group(0)}——"
+                    f"{p.name}:{lineno}: 文档点名 markdown 规格 {m.group(0)}，"
                     "本仓设计内容用 :ref:，跨仓出处加仓名标记"
                 )
             for m in REF_ROLE.finditer(line):
@@ -166,7 +166,7 @@ def check(root: Path):
                 if target in groups or target in headers:
                     continue
                 problems.append(
-                    f"{p.name}:{lineno}: 「{target} 头注」在微观层无锚点——"
+                    f"{p.name}:{lineno}: {target} 头注在微观层无锚点，"
                     f"应为 @defgroup 组名或头文件名（现有组：{', '.join(sorted(groups)) or '无'}）"
                 )
 
@@ -187,7 +187,7 @@ def check(root: Path):
                     continue
                 if any(marker in line for marker in UPSTREAM_MARKERS):
                     continue
-                problems.append(f"{rel}:{lineno}: 代码面引用 markdown 规格 {name}——设计内容转 {DOC_DIRNAME}/*.rst，或删指")
+                problems.append(f"{rel}:{lineno}: 代码面引用 markdown 规格 {name}，设计内容转 {DOC_DIRNAME}/*.rst，或删指")
 
     return problems
 

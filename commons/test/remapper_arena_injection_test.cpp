@@ -9,9 +9,9 @@
 
 // 字符串线示范(总方案 §5.1/§5.2)+ #921 staticArena 退役验收测试:
 //   1) 旧兜底路径(无 arena 注入的 remap,intern 进进程级 Type::staticArena())
-//      已在 #921 批次1 退役:Remapper/SimpleRemapper 删除无 arena 构造,
+//      已在 #921 退役:Remapper/SimpleRemapper 删除无 arena 构造,
 //      原 legacyFallbackPathGrowsStaticArena 证据测试随之移除。
-//   2) #921 批次2:进程级 staticArena 本体已整体删除——注入是唯一路径,
+//   2) #921:进程级 staticArena 本体已整体删除，注入是唯一路径,
 //      "staticArena 零增长"升级为结构保证(无池可泄),断言改为作业池承载。
 //   3) 生命周期:注入产物借用作业 arena,clear 后归还。
 

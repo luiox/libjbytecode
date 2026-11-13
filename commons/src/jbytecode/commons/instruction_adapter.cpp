@@ -854,7 +854,7 @@ void InstructionAdapter::newarray(MethodVisitor* methodVisitor, const Type& type
     case Type::DOUBLE: methodVisitor->visitIntInsn(Opcodes::NEWARRAY, Opcodes::T_DOUBLE); break;
     default:
     {
-        // #921 staticArena 退役：ARRAY 排序内部名会 intern，瞬时传递——函数级局部
+        // #921 staticArena 退役：ARRAY 排序内部名会 intern，瞬时传递，函数级局部
         // arena 零驻留。
         ca::str::Utf8StringArena scratch;
         methodVisitor->visitTypeInsn(Opcodes::ANEWARRAY, type.getInternalName(scratch));

@@ -158,7 +158,7 @@ struct CwBuilder
 };
 
 // ======================================================================
-// COMPUTE_FRAMES tests — basic method patterns
+// COMPUTE_FRAMES tests: basic method patterns
 // ======================================================================
 
 TEST(ComputeFramesTest, simpleReturn)
@@ -672,7 +672,7 @@ TEST(ComputeFramesTest, typeResolverIsForwarded)
     EXPECT_GT(resolver.callCount, 0) << "typeResolver not forwarded through Frame::merge";
 }
 
-// #575 兜底：装饰器预算——包住一个"非单调"provider（每次返回递增类型名，
+// #575 兜底：装饰器预算，包住一个"非单调"provider（每次返回递增类型名，
 // 模拟继承环/类型组合爆炸等不收敛缺陷），预算耗尽必须抛
 // CommonSuperClassBudgetExceeded，而不是无限调用。
 struct DivergingProvider : ICommonSuperClassProvider
@@ -725,7 +725,7 @@ TEST(ComputeFramesTest, computeFramesConvertsBudgetExceededToFrameComputationExc
     CwBuilder cb(Opcodes::V1_7, ref("A"));
     cb.cw.setTypeResolver(&bounded);
 
-    // f(Z)Ljava/lang/Object; —— 两个分支（String 与 Object）在 L2 汇合触发 merge。
+    // f(Z)Ljava/lang/Object;: 两个分支（String 与 Object）在 L2 汇合触发 merge。
     cb.beginMethod(Opcodes::ACC_PUBLIC | Opcodes::ACC_STATIC, ref("f"),
                    ref("(Z)Ljava/lang/Object;"));
     Label* l1 = new Label();
@@ -747,7 +747,7 @@ TEST(ComputeFramesTest, computeFramesConvertsBudgetExceededToFrameComputationExc
     EXPECT_GT(inner.callCount, 0);
 }
 
-// #575 崩溃复现：blockShuffle 重排产物——GOTO 跳转到指令流中从未 visitLabel 的
+// #575 崩溃复现：blockShuffle 重排产物，GOTO 跳转到指令流中从未 visitLabel 的
 // label（L2 丢失）。MethodWriter 不得崩溃（修复前此测试段错误）。
 TEST(ComputeFramesTest, jumpToUnvisitedLabelDoesNotCrash)
 {

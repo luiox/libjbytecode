@@ -31,7 +31,7 @@ ByteVector::ByteVector(i32 initialCapacity)
     length_       = 0;
 }
 
-// Corresponds to Java package-private ByteVector(byte[] data) — wraps existing
+// Corresponds to Java package-private ByteVector(byte[] data): wraps existing
 // byte array with length = data.length. In C++ we use length param directly.
 ByteVector::ByteVector(u8* data, i32 length)
 {

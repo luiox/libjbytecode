@@ -1,4 +1,4 @@
-﻿/// @file        primitives.hpp
+/// @file        primitives.hpp
 /// @brief       Core primitive types for bytecode analysis and classfile manipulation.
 ///
 /// This file consolidates several ASM core classes that have no complex logic
@@ -234,7 +234,7 @@ public:
     int   line            = 0;
     short flags           = 0;
 
-    /// 归属锚(B8)：创建方盖章的 owner 句柄——统一取「所属内容 arena 的地址」
+    /// 归属锚(B8)：创建方盖章的 owner 句柄，统一取所属内容 arena 的地址
     /// （MethodNode::nodeArena_ 等，P2 归属锚同源）。非 null 即 arena 所有，
     /// visitor 边界 canonicalize 直返；null 为外来堆 Label（reader/调用方自建），
     /// 入方法时拷贝收编。裸指针，不引 garena 依赖。
@@ -257,7 +257,7 @@ public:
     /// Register a forward reference (matching ASM Label.addForwardReference).
     void addForwardRef(int sourceInsnOffset, int refType, int handle);
 
-    ///  Write a jump/switch reference — if resolved, compute offset directly; else write -1
+    ///  Write a jump/switch reference: if resolved, compute offset directly; else write -1
     /// placeholder + register forward ref.
     void put(ByteVector& code, int sourceInsnOffset, bool wide);
 
@@ -564,7 +564,7 @@ public:
     }
 };
 
-/// Symbol (constant pool entries) — defined in symbol_table.hpp.
+/// Symbol (constant pool entries): defined in symbol_table.hpp.
 /// Symbol is no longer defined here to avoid duplicate definition
 /// when both primitives.hpp and symbol_table.hpp are included
 /// (e.g. via writers.hpp).

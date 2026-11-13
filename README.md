@@ -23,15 +23,14 @@ visitor 事件、字节码语义和主要类型命名与 ASM 保持一致，但�
 
 ```
 libjbytecode (聚合静态库)
-├── core/      Core API —— Visitor 模式读写 .class
-├── tree/      Tree API —— 内存树形表示（ClassNode/MethodNode/InsnList）
+├── core/      Core API: Visitor 模式读写 .class
+├── tree/      Tree API: 内存树形表示（ClassNode/MethodNode/InsnList）
 ├── commons/   实用适配器（Remapper、GeneratorAdapter、AdviceAdapter 等）
 ├── analysis/  数据流分析引擎（Analyzer、Interpreter、Frame、Value）
 └── util/      调试/追踪/验证工具（Printer、Textifier、ASMifier、CheckAdapter、TraceClassVisitor）
 ```
 
-依赖链：`core`（依赖 libca / libjstr / libgarena 包）→ `tree` / `commons` / `analysis` / `util`（依赖 core，analysis 另依赖 tree）。
-聚合库 `libjbytecode` 串联全部子库并对外暴露统一头文件。
+依赖链：`core`（依赖 libca / libjstr / libgarena 包）→ `tree` / `commons` / `analysis` / `util`（依赖 core，analysis 另依赖 tree）。聚合库 `libjbytecode` 串联全部子库并对外暴露统一头文件。
 
 ## 快速开始
 
@@ -52,7 +51,7 @@ target("myapp")
     add_packages("libjbytecode")
 ```
 
-**3. 最小示例** —— 读取 `.class`、遍历指令、写回：
+**3. 最小示例**: 读取 `.class`、遍历指令、写回：
 
 ```cpp
 #include <jbytecode/jbytecode.hpp>
@@ -116,8 +115,7 @@ xmake run libjbytecode_asm_core_unittest
 | `libjbytecode_core_unittest` | 测试 | ASM 扩展与集成测试（依赖全部子库，默认关闭） |
 | `demo_*` | 可执行 | 各类用法示例（默认关闭，`--with_demo=y`） |
 
-测试纪律（资源来源、round-trip 契约边界、`skip` 使用限制）见
-[doc/safety.rst](doc/safety.rst) 的「Round-trip 验证边界」。
+测试纪律（资源来源、round-trip 契约边界、`skip` 使用限制）见 [doc/safety.rst](doc/safety.rst) 的Round-trip 验证边界。
 
 ## 依赖
 
@@ -141,7 +139,7 @@ xmake run libjbytecode_asm_core_unittest
 
 | 文档 | 内容 |
 |------|------|
-| [doc/design.rst](doc/design.rst) | **总体设计总览（新接手者先读这篇）**：库定位、五模块分层、Visitor 链核心思想、两条主线数据流、「想做某事去哪找 API」导航 |
+| [doc/design.rst](doc/design.rst) | **总体设计总览（新接手者先读这篇）**：库定位、五模块分层、Visitor 链核心思想、两条主线数据流、想做某事去哪找 API导航 |
 | [doc/core.rst](doc/core.rst) | Core API 设计：Visitor 链、二遍扫描、常量池序列化、栈帧计算 |
 | [doc/tree.rst](doc/tree.rst) | Tree API 设计：节点结构、指令系统、回放机制 |
 | [doc/commons.rst](doc/commons.rst) | Commons 设计：Remapper 体系、Adapter 继承链 |

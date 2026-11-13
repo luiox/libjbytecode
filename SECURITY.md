@@ -8,8 +8,7 @@ Only the latest tagged release receives security fixes.
 
 Please report security issues privately rather than opening a public issue.
 
-Use GitHub's private vulnerability reporting for this repository
-(**Security → Report a vulnerability**), or contact the maintainer directly.
+Use GitHub's private vulnerability reporting for this repository (**Security → Report a vulnerability**), or contact the maintainer directly.
 
 Please include:
 
@@ -20,10 +19,6 @@ Please include:
 
 ## Scope
 
-This library parses untrusted binary input (`.class` files, archives). Reports
-about malformed-input handling — out-of-bounds access, unbounded memory growth,
-or unbounded loops triggered by hostile input — are in scope.
+This library parses untrusted binary input (`.class` files, archives). Reports about malformed-input handling: out-of-bounds access, unbounded memory growth, or unbounded loops triggered by hostile input: are in scope.
 
-Reports limited to the documented analysis boundaries (see `doc/safety.rst`)
-are not vulnerabilities; those boundaries are stated precisely and are
-intentional design decisions.
+Reports limited to the documented analysis boundaries (see `doc/safety.rst`) are not vulnerabilities; those boundaries are stated precisely and are intentional design decisions.

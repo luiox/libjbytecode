@@ -6,8 +6,8 @@
 // 字符串线示范(总方案 §5.1)验收测试:Type 注入重载。
 //   - 语义等价:getDescriptor/getInternalName 注入版产物与字面量一致;
 //     getClassName()/getMethodType(ret,args) 旧无参版已随 staticArena 退役
-//     批次1(#921)删除;无参 getDescriptor()/getInternalName() 与
-//     Type::staticArena() 进程级兜底池已随批次2(#921)整体删除——注入版是唯一
+//     #921 删除;无参 getDescriptor()/getInternalName() 与
+//     Type::staticArena() 进程级兜底池已随 #921 整体删除，注入版是唯一
 //     入口,本文件不再存在旧版比对基准;
 //   - 归零:进程级池已不存在,任何路径都不可能再落 staticArena(结构保证,
 //     见 script/gates 台账 staticArena 硬门禁);
@@ -34,7 +34,7 @@ TEST(TypeArenaInjection, getDescriptorInjectedProducesExpectedString)
     EXPECT_EQ("Lcom/foo/Bar;", toStr(injected));
 }
 
-// 无参 getClassName() 已删除(#921 批次1),基准为字面量。
+// 无参 getClassName() 已删除(#921),基准为字面量。
 TEST(TypeArenaInjection, getClassNameInjectedProducesExpectedString)
 {
     const Type obj  = Type::getObjectType(Utf8StringRef::from_cstr(kCls));
@@ -58,7 +58,7 @@ TEST(TypeArenaInjection, getInternalNameInjectedProducesExpectedString)
     EXPECT_EQ(kCls, toStr(obj.getInternalName(arena)));
 }
 
-// getMethodType(ret,args) 旧无参-arena 版已删除(#921 批次1),基准为字面量。
+// getMethodType(ret,args) 旧无参-arena 版已删除(#921),基准为字面量。
 TEST(TypeArenaInjection, getMethodTypeInjectedProducesExpectedDescriptor)
 {
     std::vector<Type> args{Type::getObjectType(Utf8StringRef::from_cstr(kCls)),
@@ -85,7 +85,7 @@ TEST(TypeArenaInjection, injectedInternsLandInCallerArenaOnly)
     (void)arr.getInternalName(arena);
     (void)Type::getMethodType(arena, Type::VOID_TYPE, args);
 
-    // intern 全部落到注入 arena;进程级池已随 #921 批次2 删除,无第二落点可泄。
+    // intern 全部落到注入 arena;进程级池已随 #921 删除,无第二落点可泄。
     EXPECT_GT(arena.size(), 0);
 }
 

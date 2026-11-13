@@ -1,5 +1,5 @@
-﻿/// @file        module_writer.cpp
-/// @brief       ModuleWriter implementation — generates Module, ModulePackages and
+/// @file        module_writer.cpp
+/// @brief       ModuleWriter implementation: generates Module, ModulePackages and
 ///              ModuleMainClass JVMS attributes (JVMS 4.7.25, 4.7.26, 4.7.27).
 ///
 ///              Follows ASM ModuleWriter.java semantics: data is written to

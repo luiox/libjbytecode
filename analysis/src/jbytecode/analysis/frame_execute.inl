@@ -1,6 +1,6 @@
 #pragma once
 
-// Out-of-line definition of Frame<V>::execute — the dataflow engine.
+// Out-of-line definition of Frame<V>::execute: the dataflow engine.
 // Faithful port of ASM org.objectweb.asm.tree.analysis.Frame.execute
 // (Frame.java L290-686). Pops operands, invokes interpreter callbacks, pushes
 // results, simulating each instruction's effect on the locals/stack frame.

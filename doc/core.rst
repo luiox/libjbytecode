@@ -105,14 +105,14 @@ Visitor 层次与事件流
 
 对应 ``MethodWriter::computeAllFrames()``\（``method_writer.cpp``\，对齐 ASM L1560-1658）\：
 
-1. **CFG 构建** —— 把每个异常处理器范围转成 ``Edge(catchType, handlerBlock)``\，挂到范围内各基本块的 ``outgoingEdges``\。
-2. **第一帧** —— ``setInputFrameFromDescriptor(access, descriptor, maxLocals)``\：构造器填 ``UNINITIALIZED_THIS``\，普通方法填 ``this`` 类型\，按描述符填参数。
-3. **Fixpoint** —— worklist 上反复 ``merge()``\，直到无基本块再变化。``merge()`` 在汇聚点合并 locals/stack\，对象类型用 ``ICommonSuperClassProvider`` 求公共父类。
-4. **死代码处理** —— 不可达基本块的字节被替换为 ``NOP...ATHROW`` 并补一个 ``Throwable`` 帧。
+1. **CFG 构建**: 把每个异常处理器范围转成 ``Edge(catchType, handlerBlock)``\，挂到范围内各基本块的 ``outgoingEdges``\。
+2. **第一帧**: ``setInputFrameFromDescriptor(access, descriptor, maxLocals)``\：构造器填 ``UNINITIALIZED_THIS``\，普通方法填 ``this`` 类型\，按描述符填参数。
+3. **Fixpoint**: worklist 上反复 ``merge()``\，直到无基本块再变化。``merge()`` 在汇聚点合并 locals/stack\，对象类型用 ``ICommonSuperClassProvider`` 求公共父类。
+4. **死代码处理**: 不可达基本块的字节被替换为 ``NOP...ATHROW`` 并补一个 ``Throwable`` 帧。
 
 .. _core-frames-abstract-type:
 
-AbstractType —— 单 int 类型编码（ASM Frame.java L137-190）
+AbstractType: 单 int 类型编码（ASM Frame.java L137-190）
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: cpp
@@ -204,9 +204,9 @@ StackMapTable 优化编码
 局限
 ^^^^
 
-1. **JSR/RET** —— 不支持。``COMPUTE_FRAMES`` 模式遇到 JSR/RET 抛 ``std::invalid_argument``\（与 ASM 相同限制）。用 ``JsrInlinerAdapter`` 先内联消除。
-2. **公共父类的精度** —— 默认 provider 只覆盖 JCL 常见类\，自定义类层次需注入 ``ICommonSuperClassProvider``\（见上）。
-3. **provider 死循环兜底** —— ``BoundedCommonSuperClassProvider``（``bounded_common_super_class_provider.hpp``\）给任意 provider 包上调用预算\；继承环等缺陷导致的无限调用超预算后抛 ``CommonSuperClassBudgetExceeded``\，由 ``MethodWriter`` 转 ``FrameComputationException``\，调用方按既有路径降级而不是进程卡死。
+1. **JSR/RET**: 不支持。``COMPUTE_FRAMES`` 模式遇到 JSR/RET 抛 ``std::invalid_argument``\（与 ASM 相同限制）。用 ``JsrInlinerAdapter`` 先内联消除。
+2. **公共父类的精度**: 默认 provider 只覆盖 JCL 常见类\，自定义类层次需注入 ``ICommonSuperClassProvider``\（见上）。
+3. **provider 死循环兜底**: ``BoundedCommonSuperClassProvider``（``bounded_common_super_class_provider.hpp``\）给任意 provider 包上调用预算\；继承环等缺陷导致的无限调用超预算后抛 ``CommonSuperClassBudgetExceeded``\，由 ``MethodWriter`` 转 ``FrameComputationException``\，调用方按既有路径降级而不是进程卡死。
 
 Tree 回放的事件顺序、迭代器失效和线程安全约束统一记录在 :doc:`safety`\，不在各 API 文档中重复维护。
 

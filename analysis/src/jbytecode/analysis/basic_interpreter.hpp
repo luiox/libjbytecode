@@ -71,7 +71,7 @@ public:
         if (this == &REFERENCE_VALUE) return "R";
         if (type_) {
             // #921 staticArena 退役：字节仅在本调用内瞬时消费（立即拷贝进返回的
-            // std::string），确无 owner 上下文——按裁决①给显式函数级局部 arena，
+            // std::string），确无 owner 上下文，按裁决①给显式函数级局部 arena，
             // 零驻留、零跨调用累积。
             ca::str::Utf8StringArena scratch;
             auto                     desc = type_->getDescriptor(scratch);
@@ -89,9 +89,9 @@ class BasicInterpreter : public Interpreter<BasicValue>
 public:
     static const jbytecode::core::Type NULL_TYPE;
 
-    /// @deprecated 兜底构造(#921 批次1 起):ANEWARRAY 合成描述符的 intern 回落到
+    /// @deprecated 兜底构造(#921 起):ANEWARRAY 合成描述符的 intern 回落到
     /// 本解释器实例私有的 fallbackArena_(随解释器析构回收;进程级 staticArena 兜底池
-    /// 已随 #921 批次2 整体删除)。AnalysisManager 驱动的链路一律用 BasicInterpreter(arena)。
+    /// 已随 #921 整体删除)。AnalysisManager 驱动的链路一律用 BasicInterpreter(arena)。
     BasicInterpreter() = default;
 
     /// 注入构造(字符串线示范,总方案 §5.1):合成描述符 intern 进调用方作业级
@@ -134,10 +134,10 @@ protected:
     ca::str::Utf8StringArena* arena_ = nullptr;
 
 private:
-    /// #921 staticArena 退役:未注入作业 arena 时的兜底 intern 池。实例级生命周期——
+    /// #921 staticArena 退役:未注入作业 arena 时的兜底 intern 池。实例级生命周期，
     /// 随本解释器析构整体回收,消除进程级无界累积。派生 interpreter(SuperVerifier/
     /// SuperInterpreter 等)从合成路径保留下来的 Type 视图因此活到解释器死亡点,
-    /// 与既有契约「分析帧不得活过本解释器」一致(见 nullability_interpreter.hpp)。
+    /// 与既有契约分析帧不得活过本解释器一致(见 nullability_interpreter.hpp)。
     ca::str::Utf8StringArena fallbackArena_;
 };
 

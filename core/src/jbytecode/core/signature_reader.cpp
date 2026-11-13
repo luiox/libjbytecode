@@ -1,5 +1,5 @@
-﻿/// @file        signature_reader.cpp
-/// @brief       SignatureReader 实现 — 从 readers.hpp 内联实现迁移而来。
+/// @file        signature_reader.cpp
+/// @brief       SignatureReader 实现，从 readers.hpp 内联实现迁移而来。
 ///              对标 org.objectweb.asm.signature.SignatureReader。
 ///
 ///              原本全部内联在 readers.hpp 中，违反"声明/实现分离"约定，

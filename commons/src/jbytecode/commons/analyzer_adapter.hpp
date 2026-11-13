@@ -67,10 +67,10 @@ public:
     void visitMaxs(int maxStack, int maxLocals) override;
 
 private:
-    /// B8：uninitialized 占位 Label 归宿（scratch，寿命 = adapter，理由同 GeneratorAdapter）。
+    /// uninitialized 占位 Label 归宿（scratch，寿命 = adapter，理由同 GeneratorAdapter）。
     garena::Arena labelArena_;
 
-    /// #921 staticArena 退役:未注入作业 arena 时的兜底 intern 池。实例级生命周期——
+    /// #921 staticArena 退役:未注入作业 arena 时的兜底 intern 池。实例级生命周期，
     /// 合成描述符只被本 adapter 的 locals_/stack_ 引用,随 adapter 析构整体回收。
     ca::str::Utf8StringArena descArena_;
 

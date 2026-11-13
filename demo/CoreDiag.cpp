@@ -1,4 +1,4 @@
-// Core API 诊断工具 — 直接用 ClassReader + ClassWriter (visitor 级别)
+// Core API 诊断工具，直接用 ClassReader + ClassWriter (visitor 级别)
 // 不依赖树 API (ClassNode)，纯粹测试 core 层的读写+帧计算
 #include <fstream>
 #include <iostream>

@@ -1,4 +1,4 @@
-﻿// type.hpp
+// type.hpp
 /// @defgroup core_type 类型描述符解析（Type）
 ///
 /// 字段/方法描述符的解析与构造（getType/getMethodDescriptor/
@@ -42,10 +42,10 @@ public:
     static const Type LONG_TYPE;
     static const Type DOUBLE_TYPE;
 
-    /// 进程级兜底池（原 staticArena，已随 #921 批次2 整体删除，#699/#921，总方案 §5.1）：
+    /// 进程级兜底池（原 staticArena，已随 #921 整体删除，#699/#921，总方案 §5.1）：
     /// getClassName()/getMethodType(ret,args) 无参重载与 remapper/basic_interpreter/
-    /// analyzer_adapter 兜底已于批次1 退役；无参 getInternalName()/getDescriptor() 的
-    /// 调用面随批次2 迁移完毕后，池本体与两个 @deprecated 无参重载一并删除。
+    /// analyzer_adapter 兜底已于 #921 退役；无参 getInternalName()/getDescriptor() 的
+    /// 调用面迁移完毕后，池本体与两个 @deprecated 无参重载一并删除。
     /// 现 intern 唯一入口是各方法的 `Utf8StringArena&` 注入重载（作业级 arena 必选）。
     /// 门禁：script/gates/gate_grep.sh 对本池的调用/定义形态作硬门禁（>0 即红）。
 

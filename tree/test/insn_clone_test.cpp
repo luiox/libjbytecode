@@ -186,7 +186,7 @@ TEST(InsnCloneTest, cloneLineNumberResolvesStartLabel)
     auto* cloned = static_cast<LineNumberNode*>(ln.clone(arena, map));
     EXPECT_TRUE(arena.owns(cloned));
     EXPECT_EQ(12, cloned->line);
-    EXPECT_NE(&start, cloned->start);   // B8：未命中也建 arena 副本，不回退引用原 label
+    EXPECT_NE(&start, cloned->start);   // 未命中也建 arena 副本，不回退引用原 label
     EXPECT_EQ(map[&start], cloned->start);
     EXPECT_EQ(&arena, cloned->start->owner());
 }
@@ -230,7 +230,7 @@ TEST(MethodNodeResolveCloneLabelTest, sameMethodArenaLabelDirectReturn)
 // -- FrameNode::clone：帧槽 Label 重映射（B8 收编在 clone 侧的对偶，#994 审查 P2）--
 //
 // FrameNode::clone 曾原样拷贝 local/stack 向量，槽内 Label* 跨 arena 直指源方法域，
-// 违背「树只持有方法级 arena 副本」契约（跨方法克隆后源方法先亡即同族悬垂）。
+// 违背树只持有方法级 arena 副本契约（跨方法克隆后源方法先亡即同族悬垂）。
 
 TEST(InsnCloneTest, cloneFrameRemapsLabelSlotsIntoTargetArena)
 {

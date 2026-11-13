@@ -9,7 +9,7 @@
 ///   2) 身份：帧内 Label 与指令侧 LabelNode 的收编副本非同一对象，写栈图时
 ///      isResolved() 恒假，Item_Uninitialized offset 落前向占位且无人回补，
 ///      StackMapTable 损坏（VerifyError）。
-/// 构造「构造器实参分支」形态使栈图携带 ITEM_UNINITIALIZED（new Integer 的
+/// 构造构造器实参分支形态使栈图携带 ITEM_UNINITIALIZED（new Integer 的
 /// 未初始化引用横跨跳转汇合帧），走真实 ClassReader 解析路径，断言：
 ///   a) 帧内 Label 与某条指令 LabelNode 的 label 同一（收编身份归位）；
 ///   b) reader 出作用域后 tree→writer(0) 逐字保真（寿命收编归位；
@@ -138,7 +138,7 @@ TEST(MethodNodeFrameLabelTest, visitFrameCanonicalizesUninitializedLabels)
     EXPECT_TRUE(allFrameLabelsCanonical);  // pre-fix：帧内持 reader 原 Label ≠ 收编副本
 
     // ── 断言 b)：reader 死亡后 tree→writer(0) 往返逐字保真 ──
-    // pre-fix：帧内 Label 已释放——linux ASAN 下此段必报 heap-use-after-free /
+    // pre-fix：帧内 Label 已释放，linux ASAN 下此段必报 heap-use-after-free /
     // heap-buffer-overflow；MSVC 下读到失效 flags/offset → 字节必不一致。
     jbytecode::core::ClassWriter writer2(arena, 0);
     node->accept(&writer2);

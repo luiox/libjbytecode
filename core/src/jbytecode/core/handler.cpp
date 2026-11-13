@@ -6,7 +6,7 @@
 namespace jbytecode::core {
 
 // ======================================================================
-// Handler — original implementation
+// Handler: original implementation
 // ======================================================================
 
 Handler* Handler::removeRange(Handler* firstHandler, Label* start, Label* end)
@@ -81,7 +81,7 @@ void Handler::putExceptionTable(const Handler* firstHandler, ByteVector& output)
 }
 
 // ======================================================================
-// Label — ASM-style forward reference management
+// Label: ASM-style forward reference management
 // ======================================================================
 
 void Label::addForwardRef(int sourceInsnOffset, int refType, int handle)

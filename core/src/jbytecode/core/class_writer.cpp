@@ -1,5 +1,5 @@
-﻿/// @file        class_writer.cpp
-/// @brief       ClassWriter implementation — generates complete ClassFile structure
+/// @file        class_writer.cpp
+/// @brief       ClassWriter implementation: generates complete ClassFile structure
 ///              (JVMS 4.1). Collects visitor data and serializes via toByteArray().
 ///
 ///              Follows ASM ClassWriter.java semantics.
@@ -285,7 +285,7 @@ MethodVisitor* ClassWriter::visitMethod(int access, Utf8StringRef name, Utf8Stri
 }
 
 // ======================================================================
-// toByteArray — serialization
+// toByteArray: serialization
 // ======================================================================
 
 std::vector<ca::u8> ClassWriter::toByteArray()
@@ -338,7 +338,7 @@ std::vector<ca::u8> ClassWriter::toByteArray()
     for (auto* rc : recordComponents_)
         if (rc) rc->collectConstants();
 
-    // ---- First pass: compute method sizes — matching ASM ClassWriter.toByteArray ----
+    // ---- First pass: compute method sizes: matching ASM ClassWriter.toByteArray ----
     int methodsSize = 0;
     for (auto* mw : methods_) methodsSize += mw->computeMethodInfoSize();
 

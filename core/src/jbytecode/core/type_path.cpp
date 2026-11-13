@@ -110,7 +110,7 @@ void TypePath::put(const TypePath* typePath, ByteVector& output)
     }
     else {
         // size_t→ca::i32 显式收窄（消 MSVC C4267）：data_ 写入面全部受 u1 值域
-        // 约束——fromString 限 stepCount ≤ 255（:100 抛出），尺寸 = 1+2×steps ≤ 511；
+        // 约束，fromString 限 stepCount ≤ 255（:100 抛出），尺寸 = 1+2×steps ≤ 511；
         // ClassReader 三处 friend 写入均按 u1 pathLength 读入，尺寸同 ≤ 511；
         // fromBytes 全仓无调用点。size() ≤ 511 远小于 ca::i32 上限，收窄值恒等。
         output.putByteArray(typePath->data_.data(), 0,

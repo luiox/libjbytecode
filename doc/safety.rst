@@ -17,7 +17,7 @@ Tree API 的指令节点有两种来源\：
 
 ``InsnList`` 的删除型操作按节点实际归属分别处理\：arena 节点只摘链\，堆节点立即 ``delete``\。判别依据是 ``ownerArena_->owns(node)``\。跨域挂入（把堆节点放进 arena 列表\，或把 arena 节点放进临时列表）会绕过该判别\：前者在清理时泄漏\，后者会对 bump 内存调用 ``delete`` 并破坏堆。新增建点一律走 ``owner.create<T>()``\，不要手工 ``new`` 后挂入 arena 列表。
 
-``remove(node)`` 只摘链\，不销毁任何节点\：堆节点此后由调用方负责释放或重新挂入\，arena 节点无需处理。需要「摘除即弃」时用 ``removeAndDelete(node)``\。
+``remove(node)`` 只摘链\，不销毁任何节点\：堆节点此后由调用方负责释放或重新挂入\，arena 节点无需处理。需要摘除即弃时用 ``removeAndDelete(node)``\。
 
 .. _safety-iterator:
 
@@ -162,9 +162,9 @@ libjbytecode 的默认 reader → tree → writer 契约是\：重新读取输�
 已知限制
 --------
 
-1. **JSR/RET 子程序指令** —— ``COMPUTE_FRAMES`` 模式遇到 JSR/RET 抛 ``std::invalid_argument``\（与 ASM 相同限制）。可用 ``JsrInlinerAdapter`` 先内联消除。
-2. **COMPUTE_FRAMES 公共父类精度** —— 默认 ``DefaultCommonSuperClassProvider`` 只内置 JCL 常见类继承表（Number/Throwable/Exception 等）\，第三方库类层次需注入自定义 ``ICommonSuperClassProvider``\。详见 :ref:`core-frames-provider`\。
-3. **``ReferenceAlignmentTest.issue307600``** —— 对输入 class 做结构化 round-trip 对比\，当前断言全 0 差异（field/method/instruction/maxStack/handler/localVariable 均须匹配）。若该测试失败\，说明 reader↔writer 往返出现结构差异\，应优先排查字节码编码层。
+1. **JSR/RET 子程序指令**: ``COMPUTE_FRAMES`` 模式遇到 JSR/RET 抛 ``std::invalid_argument``\（与 ASM 相同限制）。可用 ``JsrInlinerAdapter`` 先内联消除。
+2. **COMPUTE_FRAMES 公共父类精度**: 默认 ``DefaultCommonSuperClassProvider`` 只内置 JCL 常见类继承表（Number/Throwable/Exception 等）\，第三方库类层次需注入自定义 ``ICommonSuperClassProvider``\。详见 :ref:`core-frames-provider`\。
+3. **``ReferenceAlignmentTest.issue307600``**: 对输入 class 做结构化 round-trip 对比\，当前断言全 0 差异（field/method/instruction/maxStack/handler/localVariable 均须匹配）。若该测试失败\，说明 reader↔writer 往返出现结构差异\，应优先排查字节码编码层。
 
 .. _safety-thread:
 

@@ -430,7 +430,7 @@ int SymbolTable::addType(const Utf8StringRef& value)
     }
     // 驻留后再存：Entry::value 是视图（Utf8StringRef），调用方可能传临时缓冲的视图
     // （Frame::getAbstractTypeFromApiFormat 用栈上 std::string 拼 "L...;" 描述符后
-    // slice 出内部名传入），直接存视图会在调用方返回后悬挂——ASan 实证 heap-use-
+    // slice 出内部名传入），直接存视图会在调用方返回后悬挂，ASan 实证 heap-use-
     // after-free（后续 addConstantClass→arena_.intern 读已释放内存，class 名错乱）。
     // arena_.intern 拷入符号表 arena（与 SymbolTable 同生命周期），内容语义不变。
     return addTypeInternal(new Entry(typeCount_, Symbol::TYPE_TAG, arena_.intern(value), h));
@@ -575,7 +575,7 @@ Label* SymbolTable::getForwardUninitializedLabel(int typeIndex)
 }
 
 // ============================================================================
-// Private: addConstantDynamicOrInvokeDynamicReference (no dedup — for CP init)
+// Private: addConstantDynamicOrInvokeDynamicReference (no dedup: for CP init)
 // ============================================================================
 
 void SymbolTable::addConstantDynamicOrInvokeDynamicReference(int tag, int index,
@@ -725,7 +725,7 @@ Symbol* SymbolTable::addBootstrapMethod(const Handle&                     bootst
     for (auto& arg : bootstrapMethodArguments) hashCode ^= hashAny(arg, arena());
     hashCode &= 0x7FFFFFFF;
 
-    // Check for duplicate — if found, revert bootstrapMethods_ to original length
+    // Check for duplicate: if found, revert bootstrapMethods_ to original length
     Entry* entry = get(hashCode);
     while (entry != nullptr) {
         if (entry->tag == Symbol::BOOTSTRAP_METHOD_TAG && entry->hashCode == hashCode) {

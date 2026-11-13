@@ -7,7 +7,7 @@
 --   - libjzip（luiox-repo git 直连包）：仅 --with_demo=y（Jar 系 demo）。
 --   - gtest（xrepo，仅 --with_tests=y）。
 --
--- 仓库注册：本文件不声明 add_repositories——包沙箱会继承宿主的仓库注册，
+-- 仓库注册：本文件不声明 add_repositories，包沙箱会继承宿主的仓库注册，
 -- 在工程内重复注册同名仓库会导致嵌套包构建时 remote 路径错乱。独立开发/CI
 -- 先执行：
 --   xmake repo --add luiox-repo https://github.com/luiox/luiox-repo.git
@@ -47,7 +47,7 @@ target("libjbytecode")
              "libjbytecode_commons", "libjbytecode_util")
     add_packages("libca", "libjstr", "libgarena", {public = true})
     -- xmake 3.x 不把静态 target 依赖传进 binary 链接：windows 下显式给全闭包，
-    -- 按「消费者在前、被依赖在后」排序（与 Linux 同口径）。
+    -- 按消费者在前、被依赖在后排序（与 Linux 同口径）。
     if is_plat("windows") then
         add_deps("libjbytecode_util", "libjbytecode_commons", "libjbytecode_analysis",
                  "libjbytecode_tree", "libjbytecode_core", {public = true})

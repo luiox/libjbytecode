@@ -17,9 +17,9 @@ ca::str::Utf8StringRef cstr(const char* s)
         reinterpret_cast<const ca::u8*>(s), std::strlen(s), std::strlen(s));
 }
 
-// #1068 R19-F1：internal name 的 owning 深拷贝——返回值必须能跨函数边界
+// #1068 R19-F1：internal name 的 owning 深拷贝，返回值必须能跨函数边界
 // 存活（5 参构造函数把它交给 visitMethod，消费点在另一帧）。旧实现（#921
-// 批次2）返回指向函数级局部 scratch 的 ref，ARRAY 排序项在 return 后即悬垂；
+// 旧实现）返回指向函数级局部 scratch 的 ref，ARRAY 排序项在 return 后即悬垂；
 // 当时的"字节瞬时消费"裁决表述与实况不符（消费发生在 scratch 死后，见
 // R19-F1）。合法 JVM 异常恒为 class 排序（此路径当前不可达），但本函数
 // 服务 public 构造函数，按 owning 返回根治。scratch 仅为 intern 落点，
@@ -37,7 +37,7 @@ std::vector<ca::str::Utf8String> internalNamesOwned(const std::vector<Type>& typ
 }
 
 // #1068 R19-F1：5 参构造函数的 visitMethod 桥。owning 串与本帧的 ref 视图
-// 同帧共存，visitMethod 在帧内完成消费（下游按合同自行重新 intern）——
+// 同帧共存，visitMethod 在帧内完成消费（下游按合同自行重新 intern），
 // 跨函数边界零悬垂。
 jbytecode::core::MethodVisitor* visitMethodWithExceptions(
     int                            access,

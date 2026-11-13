@@ -1,4 +1,4 @@
-﻿/// @file        class_writer_test.cpp
+/// @file        class_writer_test.cpp
 /// @brief       Basic roundtrip tests for L4b Writer implementation.
 ///
 ///              Tests: ClassReader → ClassWriter → verify output structure
@@ -576,7 +576,7 @@ TEST(ClassWriterInternalTest, annotationComplexValues)
         auto output = cw.toByteArray();
         EXPECT_GT(output.size(), 40u);
     });
-    // checkStructuralConsistency disabled — ClassReader re-read of annotation output
+    // checkStructuralConsistency disabled: ClassReader re-read of annotation output
     // triggers reader-side crash (separate issue from writer correctness)
 }
 
@@ -631,7 +631,7 @@ TEST(ClassWriterInternalTest, typeAnnotationWrite)
              ZUtf8StringRef::from_static("java/lang/Object"),
              {});
 
-    // Class-level type annotation — use the proper encoded form
+    // Class-level type annotation: use the proper encoded form
     TypePath tp;
     int      typeRef = TypeReference::newSuperTypeReference(-1).getValue();
     auto*    tav     = cw.visitTypeAnnotation(

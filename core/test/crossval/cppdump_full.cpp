@@ -1,6 +1,6 @@
-﻿// clang-format off
+// clang-format off
 /// @file cppdump_full.cpp
-/// @brief Enhanced C++ ClassReader dumper — visits ALL events to validate
+/// @brief Enhanced C++ ClassReader dumper: visits ALL events to validate
 ///        every reader path: annotations, inner classes, nest, module,
 ///        record, stack map frames, local variables, etc.
 ///

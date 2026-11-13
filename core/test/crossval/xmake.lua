@@ -1,5 +1,5 @@
 -- crossval match tests: core reader dumper cross-validation against ASM reference
--- 静态闭包按「消费者在前、被依赖在后」显式声明（linux/windows 同口径）。
+-- 静态闭包按消费者在前、被依赖在后显式声明（linux/windows 同口径）。
 target("cppdump")
     set_kind("binary")
     set_default(false)
